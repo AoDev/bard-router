@@ -24,11 +24,12 @@ If my "experiment" proves interesting enough, I'll turn this into an actual solu
 ## Usage
 
 *TODO: complete this*
+(Actual docs coming later...)
 
 1. Define your routes as a map.
 2. Instantiate the router, passing the routes and you app store.
 3. Make the router available in React context.
-4. Use <Link/> and <Route/> in your React components.
+4. Use `<Link/>` and `<Route/>` in your React components.
 
 The router provides various hooks:
 - `beforeEnter`
@@ -36,5 +37,3 @@ The router provides various hooks:
 - `beforeLeave`
 - `afterLeave`
 - `onTheWay` (meant to process the navigation request before any hook; example: redirection)
-
-(Actual docs coming later...)
