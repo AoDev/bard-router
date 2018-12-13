@@ -119,7 +119,7 @@ const rootStore = new RootStore()
 const {uiStore, appStore} = rootStore
 
 // <-- ROUTER -->
-const router = new MobxRouter(options.routes, {
+const router = new MobxRouter(routes, {
   initialRoute: '/public',
   app: {
     appStore,
