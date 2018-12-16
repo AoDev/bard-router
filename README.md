@@ -1,4 +1,7 @@
 # Bard router
+
+[![npm version](https://badge.fury.io/js/bard-router.svg)](https://badge.fury.io/js/bard-router)
+
 **Routing solutions for applications (a personal experiment)**  
 Main use case is for my Electron application, built with React and Mobx.
 
