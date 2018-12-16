@@ -26,11 +26,35 @@ This has a direct influence on how you reason about your routes and your UI. Mor
 
 ## Install
 
-`npm install bard-router -DE`
+```
+npm install bard-router -DE
+```
 
-- It is written in ES6 and not yet transpiled as a dist. (you need to transpile it yourself)
-- You'd need lodash, react, mobx, mobx-react available.
+Dependencies needed: `lodash/isEqual`, `react`, `mobx`, `mobx-react`.
 
+### Source and transpiled versions available
+You have the choice to import the source (ES6, JSX, not transpiled) or use a transpiled version.
+
+- transpiled version is available under `lib`  
+eg: `const Router = require('bard-router/lib/Router')`
+
+- ES6 version is available under `src`  
+eg: `import Router from 'bard-router/src/Router'`
+
+If you use the source, you will have to transpile it yourself.  
+eg: if you use Webpack:
+
+```js
+rules: [
+  {
+    test: /\.jsx?$/,
+    use: ['babel-loader'],
+    include: [
+      /bard-router/,
+      path.resolve(__dirname, 'src'),
+    ],
+  },
+```
 
 ## Usage React + mobx
 

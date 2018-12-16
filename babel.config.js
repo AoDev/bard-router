@@ -5,7 +5,14 @@ module.exports = {
       {
         'loose': true
       }
-    ]
+    ],
+    [
+      '@babel/plugin-proposal-object-rest-spread',
+      {
+        'loose': true
+      }
+    ],
+    ["@babel/plugin-transform-runtime"]
   ],
   'presets': [
     [
@@ -15,14 +22,16 @@ module.exports = {
           'chrome': 61,
           'electron': '2.0.9'
         },
-        'modules': false,
+        'modules': 'commonjs',
         'useBuiltIns': 'usage'
       }
     ],
     '@babel/preset-react'
   ],
   'env': {
-    'production': {},
+    'production': {
+      'ignore': ['**/*.spec.js']
+    },
     'test': {
       'presets': [
         [

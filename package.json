@@ -4,6 +4,8 @@
   "description": "Routing solutions for applications",
   "main": "index.js",
   "scripts": {
+    "compile": "NODE_ENV=production babel src -d lib",
+    "prepublish": "npm run compile",
     "test": "jest",
     "test-unit": "jest"
   },
@@ -15,10 +17,14 @@
   "author": "Kevin Purnelle <kevin.purnelle@gmail.com> (http://kevinpurnelle.com/)",
   "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "7.2.0",
     "@babel/core": "7.2.0",
     "@babel/plugin-proposal-class-properties": "7.2.1",
+    "@babel/plugin-proposal-object-rest-spread": "7.2.0",
+    "@babel/plugin-transform-runtime": "7.2.0",
     "@babel/preset-env": "7.2.0",
     "@babel/preset-react": "7.0.0",
+    "@babel/runtime": "7.2.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "23.6.0",
     "babel-plugin-module-resolver": "3.1.1",
