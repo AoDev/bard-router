@@ -1,6 +1,6 @@
 {
   "name": "bard-router",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Routing solutions for applications",
   "main": "index.js",
   "scripts": {
