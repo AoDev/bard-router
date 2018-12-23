@@ -159,13 +159,16 @@ export default class Router {
     this[prop] = value
   }
 
-  getRouteCheck (path) {
-    return new RegExp(`^${escapeString(path)}`)
-  }
-
-  match (path) {
-    const check = this.getRouteCheck(path)
-    return check.test(this.route)
+  /**
+   * Helps to check if some params match the current router state params
+   * @param {*} params1
+   * @param {*} params2
+   * @returns {Boolean} true if params1 is a subset of params2
+   */
+  paramMatch (params1, params2) {
+    return !Object.keys(params2).some(
+      (key) => typeof params1[key] !== 'undefined' && params1[key] !== params2[key]
+    )
   }
 
   /**

@@ -69,6 +69,17 @@ describe('Router', () => {
     })
   })
 
+  describe('paramMatch()', () => {
+    it('should compare params', () => {
+      expect(router.paramMatch({}, {})).toBe(true)
+      expect(router.paramMatch({id: 1}, {})).toBe(true)
+      expect(router.paramMatch({}, {id: 1})).toBe(true)
+      expect(router.paramMatch({id: 1}, {id: 1, name: 'John'})).toBe(true)
+
+      expect(router.paramMatch({id: 1}, {id: 2})).toBe(false)
+    })
+  })
+
   describe('traverse()', () => {
     it('should update the request with onTheWay hook', () => {
       const testPath = '/private/mystuff'

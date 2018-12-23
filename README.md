@@ -30,7 +30,7 @@ This has a direct influence on how you reason about your routes and your UI. Mor
 npm install bard-router -DE
 ```
 
-Dependencies needed: `lodash/isEqual`, `react`, `mobx`, `mobx-react`.
+Dependencies needed: `react`, `mobx`, `mobx-react`.
 
 ### Source and transpiled versions available
 You have the choice to import the source (ES6, JSX, not transpiled) or use a transpiled version.

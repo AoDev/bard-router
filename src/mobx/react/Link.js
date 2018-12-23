@@ -1,13 +1,16 @@
 import {observer, inject} from 'mobx-react'
 import PropTypes from 'prop-types'
 import React from 'react'
-import isEqual from 'lodash/isEqual'
 
 export class Link extends React.Component {
   constructor (props) {
     super(props)
     this.onClick = this.onClick.bind(this)
-    this.check = props.router.getRouteCheck(props.to)
+  }
+
+  checkIfActive (to, linkParams) {
+    const {router} = this.props
+    return router.route.startsWith(to) && router.paramMatch(router.params, linkParams)
   }
 
   onClick (event) {
@@ -22,14 +25,10 @@ export class Link extends React.Component {
   }
 
   render () {
-    const {to, active, params, onClick, router, className, ...otherProps} = this.props
-    const matchFullPath = router.route === to
+    const {to, active, params, onClick, router, className, autoActive, ...otherProps} = this.props
     let cssClasses = className || ''
-    if (
-      (typeof active === 'boolean' && active === true) ||
-      (matchFullPath && isEqual(params, router.params)) ||
-      (!matchFullPath && this.check.test(router.route))
-    ) {
+
+    if ((autoActive && this.checkIfActive(to, params)) || active === true) {
       cssClasses += ' active'
     }
 
@@ -48,14 +47,15 @@ Link.propTypes = {
   onClick: PropTypes.func,
   params: PropTypes.object,
   children: PropTypes.node,
+  autoActive: PropTypes.bool.isRequired,
   active: PropTypes.bool,
   router: PropTypes.shape({
     route: PropTypes.string.isRequired,
-    getRouteCheck: PropTypes.func.isRequired,
   }).isRequired,
   className: PropTypes.string,
 }
 
 Link.defaultProps = {
   params: {},
+  autoActive: false,
 }
