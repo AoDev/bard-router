@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "compile": "NODE_ENV=production babel src -d lib",
-    "prepublish": "npm run compile",
+    "prepare": "npm run compile",
     "test": "jest",
     "test-unit": "jest"
   },
