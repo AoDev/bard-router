@@ -1,6 +1,6 @@
 {
   "name": "bard-router",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Routing solutions for applications",
   "main": "index.js",
   "scripts": {
@@ -14,6 +14,10 @@
     "react",
     "mobx"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:AoDev/bard-router.git"
+  },
   "author": "Kevin Purnelle <kevin.purnelle@gmail.com> (http://kevinpurnelle.com/)",
   "license": "MIT",
   "dependencies": {
