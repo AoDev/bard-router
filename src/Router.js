@@ -1,5 +1,13 @@
 const logger = console
 
+function removeFromArray (array, value) {
+  const index = array.indexOf(value)
+  if (index === -1) {
+    return array
+  }
+  return array.slice(0, index).concat(array.slice(index + 1))
+}
+
 /**
  * Escape characters that could cause trouble when string is converted in regular expression.
  * @param {String} str
@@ -101,6 +109,10 @@ export function traverse (router, pathNodes, currentNode, request) {
 export default class Router {
   route = '/'
   params = {}
+  history = [{route: '/', params: {}}]
+  eventHandlers = {
+    nav: [],
+  }
 
   static traverse = traverse
   static copyRequest = copyRequest
@@ -110,7 +122,7 @@ export default class Router {
    * Navigate
    * @param {{route: String, params: Object}} request
    */
-  goTo (request) {
+  goTo (request, goToOptions = {}) {
     const currentState = {
       route: this.route,
       params: this.params,
@@ -150,13 +162,43 @@ export default class Router {
       currentRouteConfig.afterLeave(this, currentState)
     }
 
-    if (this.options.onNav) {
-      this.options.onNav(this)
+    if (goToOptions.goingBack) {
+      this.history = this.history.slice(1)
+    }
+    else {
+      this.history = [updatedRequest].concat(this.history)
+    }
+
+    if (this.eventHandlers.nav.length > 0) {
+      this.eventHandlers.nav.forEach((handler) => handler(this, goToOptions))
+    }
+  }
+
+  /**
+   * Go to previous navigation request
+   */
+  goBack () {
+    if (this.history.length > 1) {
+      this.goTo(this.history[1], {goingBack: true})
     }
   }
 
   set (prop, value) {
     this[prop] = value
+  }
+
+  on (eventName, handler) {
+    if (eventName !== 'nav') {
+      throw new Error(`unknown ${eventName} event`)
+    }
+    this.eventHandlers[eventName].push(handler)
+  }
+
+  off (eventName, handler) {
+    if (eventName !== 'nav') {
+      throw new Error(`unknown ${eventName} event`)
+    }
+    removeFromArray(this.eventHandlers[eventName], handler)
   }
 
   /**
@@ -184,6 +226,7 @@ export default class Router {
     this.options = options
     this.route = options.initialRoute || '/'
     this.params = options.initialParams || {}
+    this.history = [{route: this.route, params: this.params}]
     this.app = options.app
   }
 }

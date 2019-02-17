@@ -77,7 +77,6 @@ Create a module that exports a map of your routes with optional hooks.
 - `beforeLeave`: called before leaving route UI transition
 - `afterLeave`: called after leaving route UI transition
 - `onTheWay`: meant to process the navigation request before any hook; example: redirection
-- `onNav`: called after entering any view.
 
 #### Route example
 
@@ -122,6 +121,21 @@ const routes = {
 export default routes
 ```
 
+### Router hooks
+As opposed to route specific hooks, the router hooks are handlers that you want to call any time there is a navigation event.
+
+* `'nav'`
+The handler is called with the router and the navigation options.
+
+```js
+router.on('nav', handler(router, goToOptions)))
+```
+
+For example, a typical use case is to scroll back to top when the user navigates to a different section of your app.
+
+```js
+router.on('nav', () => window.scrollTo(0, 0))
+```
 
 ### Instantiating the router
 Typically done where you mount your app.
@@ -151,10 +165,10 @@ const router = new MobxRouter(routes, {
   app: {
     appStore,
   },
-  onNav () {
-    window.scrollTo(0, 0) // scroll back to top when switching view
-  }
 })
+
+// Ask the browser to scroll back to top when switching view
+router.on('nav', () => window.scrollTo(0, 0))
 
 // <-- Typical React mount -->
 const render = (Component) => {
@@ -229,3 +243,44 @@ export default function SomeComponentWithRoute () {
   )
 }
 ```
+
+## Navigation history
+`bard-router` already maintains its history, it is thus independent of the environment.
+
+The router history can simply be read at `router.history`.  
+It is an array with the list of navigation requests that looks like this:
+
+```js
+[
+  {route: '/private/my-stuff', params: {stuffID: 'stuff1'}},
+  {route: '/public', params: {},
+  {route: '/', params: {param1: 'value1'}},
+]
+```
+The first element is the most recent request.
+
+### You can go back
+
+```js
+router.goBack()
+```
+
+## Using browser html5 history
+
+You can synchronize the router with the browser history / URL.  
+You simply need to use the `html5HistoryPlugin`. Under the hood, it is using [ReactTraining history](https://github.com/ReactTraining/history).
+
+Here is an example using ES6 and the MobxRouter.
+
+```js
+import MobxRouter from 'bard-router/src/mobx/MobxRouter'
+import html5HistoryPlugin from 'bard-router/src/html5HistoryPlugin'
+import myRoutes from './myRoutes'
+
+const router = new MobxRouter(myRoutes, {})
+const history = html5HistoryPlugin.createHistory(router)
+```
+
+The `history` returned is an instance of [createBrowserHistory from ReactTraining history](https://github.com/ReactTraining/history#usage).
+
+I am not sure yet if it is useful. You normally don't need to do anything with it, the point of `bard-router` is to be environment independent and thus, you will continue to use `bardRouter.goBack` or `bardRouter.goTo` in your app. The point of the plugin is only to synchronise with the browser history / URL.

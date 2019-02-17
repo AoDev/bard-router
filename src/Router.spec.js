@@ -13,6 +13,7 @@ const testRoutes = {
     beforeLeave: jest.fn(),
     afterLeave: jest.fn(),
   },
+  '/public/faq': {},
   '/private': {
     onTheWay: () => ({params: {auth: true}}),
     beforeEnter: jest.fn(),
@@ -35,7 +36,7 @@ const testRoutes = {
 }
 
 describe('Router', () => {
-  let router
+  let router = new Router(testRoutes, {initialRoute: '/public'})
   beforeEach(() => {
     router = new Router(testRoutes, {initialRoute: '/public'})
   })
@@ -131,6 +132,19 @@ describe('Router', () => {
       expect(router.params).toEqual(expectedState.params)
     })
 
+    it('should add an entry in history', () => {
+      // @see the testRoutes config
+      const initialRequest = {route: router.route, params: router.params}
+      const newRequest = {route: '/public/faq', params: {random: 1}}
+      const expectedNewRequest = {route: '/public/faq', params: {random: 1, root: 'passed'}}
+      expect(router.history).toHaveLength(1)
+      expect(router.history[0]).toEqual(initialRequest)
+      router.goTo(newRequest)
+      expect(router.history).toHaveLength(2)
+      expect(router.history[0]).toEqual(expectedNewRequest)
+      expect(router.history[1]).toEqual(initialRequest)
+    })
+
     describe('navigation hooks', () => {
       it('should invoke ONLY the corresponding beforeEnter hook', () => {
         const request = {route: '/private/mystuff'}
@@ -191,6 +205,20 @@ describe('Router', () => {
         expect(testRoutes['/public'].afterLeave)
           .toHaveBeenCalledWith(router, currentState)
       })
+    })
+  })
+
+  describe('goBack()', () => {
+    it('should update the history and go to the previous request', () => {
+      router.goTo({route: '/public/faq'})
+      router.goTo({route: '/private/mystuff'})
+      expect(router.history).toHaveLength(3)
+      router.goBack()
+      expect(router.history).toHaveLength(2)
+      expect(router.route).toEqual('/public/faq')
+      expect(router.params).toEqual({root: 'passed'})
+      expect(router.history[0]).toEqual({route: '/public/faq', params: {root: 'passed'}})
+      expect(router.history[1]).toEqual({route: '/public', params: {}})
     })
   })
 })
