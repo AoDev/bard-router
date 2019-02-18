@@ -76,12 +76,7 @@ export function createHistory (router, options = {}) {
   history.listen((location, action) => {
     const newRequest = requestFromLocation(location)
     if (isDifferentRequest(newRequest, router)) {
-      if (action === 'POP') {
-        router.goBack()
-      }
-      else if (action === 'PUSH') {
-        router.goTo(newRequest)
-      }
+      router.goTo(newRequest, {action})
     }
   })
 

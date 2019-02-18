@@ -165,6 +165,9 @@ export default class Router {
     if (goToOptions.goingBack) {
       this.history = this.history.slice(1)
     }
+    else if (goToOptions.action === 'POP') {
+      this.history = [updatedRequest].concat(this.history.slice(1))
+    }
     else {
       this.history = [updatedRequest].concat(this.history)
     }
@@ -179,7 +182,7 @@ export default class Router {
    */
   goBack () {
     if (this.history.length > 1) {
-      this.goTo(this.history[1], {goingBack: true})
+      this.goTo(this.history[1], {action: 'POP', goingBack: true})
     }
   }
 
