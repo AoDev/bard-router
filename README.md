@@ -19,9 +19,11 @@ I am using it in my production react/mobx apps, in browsers and in Desktop apps 
 
 > In medieval Gaelic and British culture, a **"bard"** was a story teller.  They would talk about the people's journey in the world. A user interacting with an aplication is like a journey that the router allows to take, tell and remember.
 
-## Philosophy
+## Philosophy: decouple state and UI + app shell architecture
 
 Inspired by this article from mobx author: [decouple state and UI](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37), **bard-router** allows you to command your application models and select the right view to present the data while adhering to the original philosophy of React: `(appState) => UI`.
+
+The "opiniated side" of **bard-router** also comes from ideas of the [app shell architecture](https://developers.google.com/web/fundamentals/architecture/app-shell).
 
 Plus, I want the API to be as small and simple as possible. Routing should be a "no-brainer".
 
@@ -74,9 +76,7 @@ Create a module that exports a map of your routes with optional hooks.
 `routes.js`
 ```js
 const routes = {
-  '/': {
-    // route config
-  },
+  '/': {}, // route config
   '/public': {},
   '/public/sign-in': {},
 
@@ -89,15 +89,21 @@ const routes = {
 export default routes
 ```
 
+The routes request "path" is strictly reserved to display the right view, in other words: navigate the app shell, while any dynamic content, usually coming from a web API, will use the request params to display the corresponding data.
+
+Eg: there is no route like: `/private/thing/:thingID/edit` but rather `/private/thing/edit?thingID=x`.
+
+
 #### Hooks available
 
 - `beforeEnter`: called before entering route UI transition
 - `afterEnter`: called after entering route UI transition
 - `beforeLeave`: called before leaving route UI transition
 - `afterLeave`: called after leaving route UI transition
-- `onTheWay`: meant to process the navigation request before any hook.
+- `onTheWay`: meant to process the navigation request before any hook
 
 ### The `onTheWay` hook
+
 Is specifically meant to alter navigation requests. So you can see it as some kind of interceptor and **it must always return a navigation request**.
 
 The typical use case is for handling **redirection**.
@@ -226,7 +232,7 @@ Link gets two props: `to` and `params` that represents a routing request.
 
 To help with typical UI patterns, you can automatically get an `active` CSS class on your link if it matches the current route, by setting the `autoActive` attribute.
 
-You can manually control this behaviour by setting. `active={true|false}`
+You can manually control this behaviour by setting `active={true|false}`.
 
 #### Link component example
 ```js
