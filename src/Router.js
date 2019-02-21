@@ -9,14 +9,6 @@ function removeFromArray (array, value) {
 }
 
 /**
- * Escape characters that could cause trouble when string is converted in regular expression.
- * @param {String} str
- */
-function escapeString (str) {
-  return str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&')
-}
-
-/**
  * @see splitPath
  */
 function splitPathReducer (acc, step, index) {
@@ -190,6 +182,11 @@ export default class Router {
     this[prop] = value
   }
 
+  /**
+   * Attach router hook.
+   * @param {String} eventName - Valid events: 'nav'
+   * @param {Function} handler - Will be called like: handler(router, goToOptions)
+   */
   on (eventName, handler) {
     if (eventName !== 'nav') {
       throw new Error(`unknown ${eventName} event`)
@@ -197,6 +194,11 @@ export default class Router {
     this.eventHandlers[eventName].push(handler)
   }
 
+  /**
+   * Remove router hook.
+   * @param {String} eventName - Valid events: 'nav'
+   * @param {Function} handler - Anonymous functions can not be removed
+   */
   off (eventName, handler) {
     if (eventName !== 'nav') {
       throw new Error(`unknown ${eventName} event`)
@@ -222,7 +224,6 @@ export default class Router {
    * @param {String} options.initialRoute - set the router initial route
    * @param {Object} options.initialParams - set the router initial route
    * @param {Object} options.app - anything you'd like to be able to access in the hooks
-   * @param {Function} options.onNav - run every time the route is updated
    */
   constructor (routes = {}, options = {}) {
     this.routes = routes
