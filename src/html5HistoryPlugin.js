@@ -68,7 +68,7 @@ export function createHistory (router, options = {}) {
         history.goBack()
       }
       else {
-        history.push(locationFromRequest(router.history[0]))
+        history.push(locationFromRequest(router.story[0]))
       }
     }
   })
@@ -79,6 +79,8 @@ export function createHistory (router, options = {}) {
       router.goTo(newRequest, {action})
     }
   })
+
+  router.goTo(requestFromLocation(history.location))
 
   return history
 }

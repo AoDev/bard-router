@@ -36,29 +36,22 @@ const testRoutes = {
 }
 
 describe('Router', () => {
-  let router = new Router(testRoutes, {initialRoute: '/public'})
+  let router
   beforeEach(() => {
-    router = new Router(testRoutes, {initialRoute: '/public'})
+    router = new Router(testRoutes, {initialRequest: {route: '/public'}})
   })
 
   describe('initial state', () => {
-    it('should have "/" (empty) as default initial route', () => {
+    it('should use root "/" and empty params as default for initial request', () => {
       router = new Router()
       expect(router.route).toBe('/')
-    })
-
-    it('should use the initial route given through the options', () => {
-      const routerWithOptions = new Router(null, {initialRoute: '/public'})
-      expect(routerWithOptions.route).toBe('/public')
-    })
-
-    it('should have no params by default', () => {
       expect(router.params).toEqual({})
     })
 
-    it('should use the initial params given through the options', () => {
-      const routerWithOptions = new Router(null, {initialParams: {id: 1}})
-      expect(routerWithOptions.params).toEqual({id: 1})
+    it('should use the initial request given through the options', () => {
+      const routerWithOptions = new Router(testRoutes, {initialRequest: {route: '/public', params: {some: 'param'}}})
+      expect(routerWithOptions.route).toBe('/public')
+      expect(routerWithOptions.params).toEqual({some: 'param', root: 'passed'})
     })
   })
 
@@ -66,6 +59,13 @@ describe('Router', () => {
     it('should split the path', () => {
       const testPath = '/private/mystuff/details'
       const expected = ['/', '/private', '/private/mystuff', '/private/mystuff/details']
+      expect(splitPath(testPath)).toEqual(expected)
+    })
+
+    it('should split correctly when it is only the root request', () => {
+      // This test is there because a bug was found and caused an infinite loop
+      const testPath = '/'
+      const expected = ['/']
       expect(splitPath(testPath)).toEqual(expected)
     })
   })
@@ -82,6 +82,17 @@ describe('Router', () => {
   })
 
   describe('traverse()', () => {
+    it('should work with only root request', () => {
+      const testPath = '/'
+      router.set('routes', testRoutes)
+      const pathNodes = splitPath(testPath)
+      const request = {route: '/', params: {}}
+      expect(traverse(router, pathNodes, pathNodes[0], request)).toEqual({
+        params: {root: 'passed'},
+        route: '/'
+      })
+    })
+
     it('should update the request with onTheWay hook', () => {
       const testPath = '/private/mystuff'
       router.set('routes', testRoutes)
@@ -107,7 +118,7 @@ describe('Router', () => {
 
   describe('goTo()', () => {
     it('should not modify the original request object', () => {
-      const request = {route: '/my-cryptos', params: {id: 1}}
+      const request = {route: '/private/mystuff', params: {id: 1}}
       const spy = jest.spyOn(Router, 'copyRequest')
       router.goTo(request)
       expect(spy).toHaveBeenCalledWith(request)
@@ -137,12 +148,12 @@ describe('Router', () => {
       const initialRequest = {route: router.route, params: router.params}
       const newRequest = {route: '/public/faq', params: {random: 1}}
       const expectedNewRequest = {route: '/public/faq', params: {random: 1, root: 'passed'}}
-      expect(router.history).toHaveLength(1)
-      expect(router.history[0]).toEqual(initialRequest)
+      expect(router.story).toHaveLength(1)
+      expect(router.story[0]).toEqual(initialRequest)
       router.goTo(newRequest)
-      expect(router.history).toHaveLength(2)
-      expect(router.history[0]).toEqual(expectedNewRequest)
-      expect(router.history[1]).toEqual(initialRequest)
+      expect(router.story).toHaveLength(2)
+      expect(router.story[0]).toEqual(expectedNewRequest)
+      expect(router.story[1]).toEqual(initialRequest)
     })
 
     describe('navigation hooks', () => {
@@ -165,7 +176,7 @@ describe('Router', () => {
         const request = {route: '/private/mystuff'}
         const currentState = {
           route: '/public',
-          params: {},
+          params: {root: 'passed'},
         }
         router.goTo(request)
         expect(testRoutes['/'].afterEnter).not.toHaveBeenCalled()
@@ -197,7 +208,7 @@ describe('Router', () => {
         const request = {route: '/private/mystuff'}
         const currentState = {
           route: '/public',
-          params: {},
+          params: {root: 'passed'},
         }
         router.goTo(request)
         expect(testRoutes['/'].afterLeave).not.toHaveBeenCalled()
@@ -212,13 +223,13 @@ describe('Router', () => {
     it('should update the history and go to the previous request', () => {
       router.goTo({route: '/public/faq'})
       router.goTo({route: '/private/mystuff'})
-      expect(router.history).toHaveLength(3)
+      expect(router.story).toHaveLength(3)
       router.goBack()
-      expect(router.history).toHaveLength(2)
+      expect(router.story).toHaveLength(2)
       expect(router.route).toEqual('/public/faq')
       expect(router.params).toEqual({root: 'passed'})
-      expect(router.history[0]).toEqual({route: '/public/faq', params: {root: 'passed'}})
-      expect(router.history[1]).toEqual({route: '/public', params: {}})
+      expect(router.story[0]).toEqual({route: '/public/faq', params: {root: 'passed'}})
+      expect(router.story[1]).toEqual({route: '/public', params: {root: 'passed'}})
     })
   })
 })

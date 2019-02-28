@@ -286,9 +286,9 @@ export default function SomeComponentWithRoute () {
 ```
 
 ## Navigation history
-`bard-router` already maintains its history, it is thus independent of the environment.
+`bard-router` already maintains its internal history, it is thus independent of the environment.
 
-The router history can simply be read at `router.history`.  
+The router history can simply be read at `router.story`.  
 It is an array with the list of navigation requests that looks like this:
 
 ```js
@@ -299,6 +299,8 @@ It is an array with the list of navigation requests that looks like this:
 ]
 ```
 The first element is the most recent request.
+
+In the case of MobxRouter, it is observable.
 
 ### You can go back
 
@@ -318,11 +320,12 @@ import MobxRouter from 'bard-router/src/mobx/MobxRouter'
 import html5HistoryPlugin from 'bard-router/src/html5HistoryPlugin'
 import myRoutes from './myRoutes'
 
-const router = new MobxRouter(myRoutes, {})
-const history = html5HistoryPlugin.createHistory(router)
+const router = new MobxRouter(myRoutes, {
+  historyPlugin: html5HistoryPlugin,
+})
 ```
 
-The `history` returned is an instance of [createBrowserHistory from ReactTraining history](https://github.com/ReactTraining/history#usage).
+If needed, you can access the `history` instance of [createBrowserHistory from ReactTraining history](https://github.com/ReactTraining/history#usage) at `router.history`.
 
 ## Recipes / FAQ
 

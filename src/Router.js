@@ -22,6 +22,9 @@ function splitPathReducer (acc, step, index) {
  * @param {String} path
  */
 export function splitPath (path) {
+  if (path === '/') {
+    return ['/']
+  }
   const pathNodes = path.split('/').reduce(splitPathReducer, [])
   pathNodes[0] = '/'
   return pathNodes
@@ -99,9 +102,9 @@ export function traverse (router, pathNodes, currentNode, request) {
  * Simple router
  */
 export default class Router {
-  route = '/'
+  route = ''
   params = {}
-  history = [{route: '/', params: {}}]
+  story = []
   eventHandlers = {
     nav: [],
   }
@@ -155,13 +158,13 @@ export default class Router {
     }
 
     if (goToOptions.goingBack) {
-      this.history = this.history.slice(1)
+      this.story = this.story.slice(1)
     }
     else if (goToOptions.action === 'POP') {
-      this.history = [updatedRequest].concat(this.history.slice(1))
+      this.story = [updatedRequest].concat(this.story.slice(1))
     }
     else {
-      this.history = [updatedRequest].concat(this.history)
+      this.story = [updatedRequest].concat(this.story)
     }
 
     if (this.eventHandlers.nav.length > 0) {
@@ -173,8 +176,8 @@ export default class Router {
    * Go to previous navigation request
    */
   goBack () {
-    if (this.history.length > 1) {
-      this.goTo(this.history[1], {action: 'POP', goingBack: true})
+    if (this.story.length > 1) {
+      this.goTo(this.story[1], {action: 'POP', goingBack: true})
     }
   }
 
@@ -221,16 +224,19 @@ export default class Router {
   /**
    * @param {Object} routes - List of routes: hooks, name, etc
    * @param {Object} options - options
-   * @param {String} options.initialRoute - set the router initial route
-   * @param {Object} options.initialParams - set the router initial route
+   * @param {{route: String, params: Object}} options.initialRequest - set the router initial route
    * @param {Object} options.app - anything you'd like to be able to access in the hooks
+   * @param {Object} options.historyPlugin
    */
   constructor (routes = {}, options = {}) {
     this.routes = routes
     this.options = options
-    this.route = options.initialRoute || '/'
-    this.params = options.initialParams || {}
-    this.history = [{route: this.route, params: this.params}]
     this.app = options.app
+    if (options.historyPlugin) {
+      this.history = options.historyPlugin.createHistory(this)
+    }
+    else {
+      this.goTo(options.initialRequest || {route: '/'})
+    }
   }
 }
