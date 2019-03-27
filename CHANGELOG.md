@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.1](https://github.com/AoDev/bard-router/compare/v0.2.0...v0.2.1) (2019-03-27)
+
+
+### Bug Fixes
+
+* **methods:** goTo and goBack are now bound to the instance ([fc08bb8](https://github.com/AoDev/bard-router/commit/fc08bb8))
+
+
+
 ## 0.2.0 (2019-02-28)
 
 
