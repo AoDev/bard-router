@@ -232,6 +232,8 @@ export default class Router {
     this.routes = routes
     this.options = options
     this.app = options.app
+    this.goBack = this.goBack.bind(this)
+    this.goTo = this.goTo.bind(this)
     if (options.historyPlugin) {
       this.history = options.historyPlugin.createHistory(this)
     }
