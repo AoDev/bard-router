@@ -2,6 +2,7 @@
   "name": "bard-router",
   "version": "0.2.1",
   "description": "Routing solutions for applications",
+  "homepage": "https://github.com/AoDev/bard-router",
   "main": "index.js",
   "scripts": {
     "compile": "NODE_ENV=production babel src -d lib",

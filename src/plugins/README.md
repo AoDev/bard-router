@@ -1,7 +1,10 @@
 # Plugins for bard-router
 
-## windowTitlePlugin
+* [windowTitlePlugin](#windowTitlePlugin)
+* [html5HistoryPlugin](#html5HistoryPlugin)
 
+## windowTitlePlugin
+<a name="windowTitlePlugin"></a>
 Automatically sync the page title with the router state.
 
 ### How to use?
@@ -57,3 +60,21 @@ stopTitlePlugin()
 
 In the example above, it means that the page title would look like: `Bard - Some page`
 
+
+## html5HistoryPlugin
+<a name="html5HistoryPlugin"></a>
+
+You can synchronize the router with the browser history / URL.  
+You simply need to use the `html5HistoryPlugin`. Under the hood, it is using [ReactTraining history](https://github.com/ReactTraining/history).
+
+Here is an example using ES6 and the MobxRouter.
+
+```js
+import MobxRouter from 'bard-router/src/mobx/MobxRouter'
+import html5HistoryPlugin from 'bard-router/src/plugins/html5HistoryPlugin'
+
+const router = new MobxRouter(/*...*/)
+html5HistoryPlugin.register(router)
+```
+
+If needed, you can access the `history` instance of [createBrowserHistory from ReactTraining history](https://github.com/ReactTraining/history#usage) at `router.history`.

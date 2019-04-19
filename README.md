@@ -1,6 +1,7 @@
 # Bard router
 
 [![npm version](https://badge.fury.io/js/bard-router.svg)](https://badge.fury.io/js/bard-router)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 **Routing solution for React/Mobx applications**.
 
@@ -310,22 +311,7 @@ router.goBack()
 
 ## Using browser html5 history
 
-You can synchronize the router with the browser history / URL.  
-You simply need to use the `html5HistoryPlugin`. Under the hood, it is using [ReactTraining history](https://github.com/ReactTraining/history).
-
-Here is an example using ES6 and the MobxRouter.
-
-```js
-import MobxRouter from 'bard-router/src/mobx/MobxRouter'
-import html5HistoryPlugin from 'bard-router/src/html5HistoryPlugin'
-import myRoutes from './myRoutes'
-
-const router = new MobxRouter(myRoutes, {
-  historyPlugin: html5HistoryPlugin,
-})
-```
-
-If needed, you can access the `history` instance of [createBrowserHistory from ReactTraining history](https://github.com/ReactTraining/history#usage) at `router.history`.
+[Check the html5HistoryPlugin](https://github.com/AoDev/bard-router/tree/master/src/plugins)
 
 ## Recipes / FAQ
 
@@ -350,4 +336,25 @@ Use the `on('nav')` hook.
 
 ```js
 router.on('nav', () => window.scrollTo(0, 0))
+```
+
+### How to handle 404 / not found?
+1. Set the `routeNotFound` option that should be the route to redirect to.
+```js
+const router = new MobxRouter({
+  routeNotFound: '/not-found',
+  /*...*/
+})
+```
+
+2. Have a defined corresponding route
+```js
+{
+  '/not-found': {},
+}
+```
+
+3. Add a corresponding Route + Component in your UI
+```js
+<Route path="/not-found" Component={NotFound}/>
 ```

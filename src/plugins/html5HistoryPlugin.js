@@ -1,5 +1,10 @@
-import _createBrowserHistory from 'history/createBrowserHistory'
+import {createBrowserHistory} from 'history'
 
+/**
+ * Check if two objects have same properties, one level deep
+ * @param {*} obj1
+ * @param {*} obj2
+ */
 function isEqual (obj1, obj2) {
   const obj1Keys = Object.keys(obj1)
   const obj2Keys = Object.keys(obj2)
@@ -58,9 +63,13 @@ function isDifferentRequest (request1, request2) {
  * @param {*} router
  * @returns {History}
  */
-export function createHistory (router, options = {}) {
-  const history = _createBrowserHistory()
+export function register (router, options = {}) {
+  const history = createBrowserHistory()
 
+  /**
+   * Sync router -> browser history
+   * = User is navigating using the app UI
+   */
   router.on('nav', (router, goToOptions) => {
     const requestFromBrowser = requestFromLocation(history.location)
     if (isDifferentRequest(requestFromBrowser, router)) {
@@ -73,6 +82,10 @@ export function createHistory (router, options = {}) {
     }
   })
 
+  /**
+   * Sync browser history -> router
+   * = User is navigating using the url in the browser
+   */
   history.listen((location, action) => {
     const newRequest = requestFromLocation(location)
     if (isDifferentRequest(newRequest, router)) {
@@ -86,5 +99,5 @@ export function createHistory (router, options = {}) {
 }
 
 export default {
-  createHistory,
+  register,
 }

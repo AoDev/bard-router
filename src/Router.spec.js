@@ -3,42 +3,50 @@ import Router, {splitPath, traverse, copyRequest} from './Router'
 const testRoutes = {
   '/': {
     onTheWay: () => ({params: {root: 'passed'}}),
+    beforeEnter: jest.fn(),
     beforeLeave: jest.fn(),
-    afterLeave: jest.fn(),
     afterEnter: jest.fn(),
+    afterLeave: jest.fn(),
   },
   '/public': {
     beforeEnter: jest.fn(),
-    afterEnter: jest.fn(),
     beforeLeave: jest.fn(),
+    afterEnter: jest.fn(),
     afterLeave: jest.fn(),
   },
-  '/public/faq': {},
+  '/public/faq': {
+    beforeEnter: jest.fn(),
+    beforeLeave: jest.fn(),
+    afterEnter: jest.fn(),
+    afterLeave: jest.fn(),
+  },
   '/private': {
     onTheWay: () => ({params: {auth: true}}),
     beforeEnter: jest.fn(),
-    afterEnter: jest.fn(),
     beforeLeave: jest.fn(),
+    afterEnter: jest.fn(),
     afterLeave: jest.fn(),
   },
   '/private/mystuff': {
     onTheWay: () => ({params: {id: 1}, route: '/private/mystuff/details'}), // test redirect
-    afterEnter: jest.fn(),
+    beforeEnter: jest.fn(),
     beforeLeave: jest.fn(),
+    afterEnter: jest.fn(),
+    afterLeave: jest.fn(),
   },
   '/private/mystuff/details': {
     onTheWay: () => ({params: {details: 'ok'}}),
     beforeEnter: jest.fn(),
+    beforeLeave: jest.fn(),
     afterEnter: jest.fn(),
     afterLeave: jest.fn(),
-    beforeLeave: jest.fn(),
   },
 }
 
 describe('Router', () => {
   let router
   beforeEach(() => {
-    router = new Router(testRoutes, {initialRequest: {route: '/public'}})
+    router = new Router({routes: testRoutes, initialRequest: {route: '/public'}})
   })
 
   describe('initial state', () => {
@@ -46,12 +54,6 @@ describe('Router', () => {
       router = new Router()
       expect(router.route).toBe('/')
       expect(router.params).toEqual({})
-    })
-
-    it('should use the initial request given through the options', () => {
-      const routerWithOptions = new Router(testRoutes, {initialRequest: {route: '/public', params: {some: 'param'}}})
-      expect(routerWithOptions.route).toBe('/public')
-      expect(routerWithOptions.params).toEqual({some: 'param', root: 'passed'})
     })
   })
 
@@ -145,76 +147,88 @@ describe('Router', () => {
 
     it('should add an entry in history', () => {
       // @see the testRoutes config
-      const initialRequest = {route: router.route, params: router.params}
+      const initialRequest = {route: '/public', params: {}}
+      const expectedInitialRequest = {route: '/public', params: {root: 'passed'}}
       const newRequest = {route: '/public/faq', params: {random: 1}}
       const expectedNewRequest = {route: '/public/faq', params: {random: 1, root: 'passed'}}
+      router.goTo(initialRequest)
       expect(router.story).toHaveLength(1)
-      expect(router.story[0]).toEqual(initialRequest)
+      expect(router.story[0]).toEqual(expectedInitialRequest)
       router.goTo(newRequest)
       expect(router.story).toHaveLength(2)
       expect(router.story[0]).toEqual(expectedNewRequest)
-      expect(router.story[1]).toEqual(initialRequest)
+      expect(router.story[1]).toEqual(expectedInitialRequest)
     })
 
     describe('navigation hooks', () => {
-      it('should invoke ONLY the corresponding beforeEnter hook', () => {
-        const request = {route: '/private/mystuff'}
-        // @see the testRoutes config
-        const expectedUpdatedRequest = {
-          route: '/private/mystuff/details',
-          params: {id: 1, auth: true, details: 'ok', root: 'passed'},
-        }
-        router.goTo(request)
-        expect(testRoutes['/private'].beforeEnter).not.toHaveBeenCalled()
-        expect(testRoutes['/private/mystuff/details'].beforeEnter)
-          .toHaveBeenCalledWith(router, expectedUpdatedRequest)
+      test('none of them should have been triggered when router is instantiated', () => {
+        Object.keys(testRoutes).forEach((key) => {
+          const routeConfig = testRoutes[key]
+          expect(routeConfig.beforeEnter).not.toHaveBeenCalled()
+          expect(routeConfig.beforeLeave).not.toHaveBeenCalled()
+          expect(routeConfig.afterEnter).not.toHaveBeenCalled()
+          expect(routeConfig.afterLeave).not.toHaveBeenCalled()
+        })
       })
 
-      it('should invoke ONLY the corresponding afterEnter hook', () => {
-        // reminder: initial route in tests is /public
-        // @see the testRoutes config
-        const request = {route: '/private/mystuff'}
-        const currentState = {
-          route: '/public',
-          params: {root: 'passed'},
-        }
-        router.goTo(request)
-        expect(testRoutes['/'].afterEnter).not.toHaveBeenCalled()
-        expect(testRoutes['/private'].afterEnter).not.toHaveBeenCalled()
-        expect(testRoutes['/private/mystuff'].afterEnter).not.toHaveBeenCalled()
-        expect(testRoutes['/private/mystuff/details'].afterEnter)
-          .toHaveBeenCalledWith(router, currentState)
+      describe('- on first request', () => {
+        it('should trigger only the beforeEnter and afterEnter of the corresponding route', () => {
+          const request = {route: '/private/mystuff'}
+          const expectedUpdatedRequest = {
+            // @see the testRoutes config
+            route: '/private/mystuff/details',
+            params: {id: 1, auth: true, details: 'ok', root: 'passed'},
+          }
+          router.goTo(request)
+          Object.keys(testRoutes).forEach((key) => {
+            const routeConfig = testRoutes[key]
+            if (key !== expectedUpdatedRequest.route) {
+              expect(routeConfig.beforeEnter).not.toHaveBeenCalled()
+              expect(routeConfig.beforeLeave).not.toHaveBeenCalled()
+              expect(routeConfig.afterEnter).not.toHaveBeenCalled()
+              expect(routeConfig.afterLeave).not.toHaveBeenCalled()
+            }
+            else {
+              expect(routeConfig.beforeEnter).toHaveBeenCalledWith(router, expectedUpdatedRequest)
+              expect(routeConfig.beforeLeave).not.toHaveBeenCalled()
+              expect(routeConfig.afterEnter).toHaveBeenCalled()
+              const afterEnterArgs = routeConfig.afterEnter.mock.calls[0]
+              expect(afterEnterArgs[0]).toBe(router)
+              expect(routeConfig.afterLeave).not.toHaveBeenCalled()
+            }
+          })
+        })
       })
 
-      it('should invoke ONLY the corresponding beforeLeave hook', () => {
-        // reminder: initial route in tests is /public
-        // @see the testRoutes config
-        const request = {route: '/private/mystuff'}
-        const expectedUpdatedRequest = {
-          route: '/private/mystuff/details',
-          params: {id: 1, auth: true, details: 'ok', root: 'passed'},
-        }
-        router.goTo(request)
-        expect(testRoutes['/'].beforeLeave).not.toHaveBeenCalled()
-        expect(testRoutes['/private'].beforeLeave).not.toHaveBeenCalled()
-        expect(testRoutes['/private/mystuff'].beforeLeave).not.toHaveBeenCalled()
-        expect(testRoutes['/public'].beforeLeave)
-          .toHaveBeenCalledWith(router, expectedUpdatedRequest)
-      })
-
-      it('should invoke ONLY the corresponding afterLeave hook', () => {
-        // reminder: initial route in tests is /public
-        // @see the testRoutes config
-        const request = {route: '/private/mystuff'}
-        const currentState = {
-          route: '/public',
-          params: {root: 'passed'},
-        }
-        router.goTo(request)
-        expect(testRoutes['/'].afterLeave).not.toHaveBeenCalled()
-        expect(testRoutes['/private'].afterLeave).not.toHaveBeenCalled()
-        expect(testRoutes['/public'].afterLeave)
-          .toHaveBeenCalledWith(router, currentState)
+      describe('- on subsequent requests', () => {
+        it('should trigger the right corresponding hooks', () => {
+          const initialRequest = {route: '/public'}
+          router.goTo(initialRequest)
+          jest.resetAllMocks()
+          const newRequest = {route: '/private/mystuff/details', params: {id: 1}}
+          router.goTo(newRequest)
+          Object.keys(testRoutes).forEach((key) => {
+            const routeConfig = testRoutes[key]
+            if (key !== initialRequest.route && key !== newRequest.route) {
+              expect(routeConfig.beforeEnter).not.toHaveBeenCalled()
+              expect(routeConfig.beforeLeave).not.toHaveBeenCalled()
+              expect(routeConfig.afterEnter).not.toHaveBeenCalled()
+              expect(routeConfig.afterLeave).not.toHaveBeenCalled()
+            }
+            else if (key === initialRequest.route) {
+              expect(routeConfig.beforeLeave).toHaveBeenCalled()
+              expect(routeConfig.afterLeave).toHaveBeenCalled()
+              expect(routeConfig.beforeEnter).not.toHaveBeenCalled()
+              expect(routeConfig.afterEnter).not.toHaveBeenCalled()
+            }
+            else if (key === newRequest.route) {
+              expect(routeConfig.beforeLeave).not.toHaveBeenCalled()
+              expect(routeConfig.afterLeave).not.toHaveBeenCalled()
+              expect(routeConfig.beforeEnter).toHaveBeenCalled()
+              expect(routeConfig.afterEnter).toHaveBeenCalled()
+            }
+          })
+        })
       })
     })
   })
@@ -223,13 +237,12 @@ describe('Router', () => {
     it('should update the history and go to the previous request', () => {
       router.goTo({route: '/public/faq'})
       router.goTo({route: '/private/mystuff'})
-      expect(router.story).toHaveLength(3)
-      router.goBack()
       expect(router.story).toHaveLength(2)
+      router.goBack()
+      expect(router.story).toHaveLength(1)
       expect(router.route).toEqual('/public/faq')
       expect(router.params).toEqual({root: 'passed'})
       expect(router.story[0]).toEqual({route: '/public/faq', params: {root: 'passed'}})
-      expect(router.story[1]).toEqual({route: '/public', params: {root: 'passed'}})
     })
   })
 })

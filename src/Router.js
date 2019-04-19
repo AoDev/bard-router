@@ -98,11 +98,27 @@ export function traverse (router, pathNodes, currentNode, request) {
 }
 
 /**
+ * Update the internal history of the router
+ * @param {*} story
+ * @param {*} request
+ * @param {*} goToOptions
+ */
+function updateStory (story, request, goToOptions) {
+  if (goToOptions.goingBack) {
+    return story.slice(1)
+  }
+  if (goToOptions.action === 'POP') {
+    return [request].concat(story.slice(1))
+  }
+  return [request].concat(story)
+}
+
+/**
  * @class Router
  * Simple router
  */
 export default class Router {
-  route = ''
+  route = '/'
   params = {}
   story = []
   eventHandlers = {
@@ -130,18 +146,30 @@ export default class Router {
     const pathNodes = Router.splitPath(request.route)
     updatedRequest = Router.traverse(this, pathNodes, pathNodes[0], updatedRequest)
 
-    const routeConfig = this.routes[updatedRequest.route]
+    let routeConfig = this.routes[updatedRequest.route]
 
     if (!routeConfig) {
-      logger.warn('404 - Unknown route')
-      // TODO route not found
+      // TODO: should probable handle not found in the "traverse"
+      if (this.options.routeNotFound) {
+        if (!this.routes[this.options.routeNotFound]) {
+          // Prevent an infinite loop
+          throw new Error(`No corresponding route to "routeNotFound". Falling back to '/'. Got ${this.options.routeNotFound}`)
+        }
+        updatedRequest = {route: this.options.routeNotFound, params: {}}
+        routeConfig = this.routes[updatedRequest.route]
+      }
+      else {
+        logger.warn('404 - route not found. Consider routeNotFound option.')
+        updatedRequest = {route: '/', params: {}}
+        routeConfig = this.routes[updatedRequest.route]
+      }
     }
 
-    if (routeConfig && routeConfig.beforeEnter) {
+    if (routeConfig.beforeEnter) {
       routeConfig.beforeEnter(this, updatedRequest)
     }
 
-    if (currentRouteConfig && currentRouteConfig.beforeLeave) {
+    if (currentRouteConfig.beforeLeave && this.story.length > 0) {
       currentRouteConfig.beforeLeave(this, updatedRequest)
     }
 
@@ -149,27 +177,21 @@ export default class Router {
     this.route = updatedRequest.route
     this.params = updatedRequest.params
 
-    if (routeConfig && routeConfig.afterEnter) {
+    if (routeConfig.afterEnter) {
       routeConfig.afterEnter(this, currentState)
     }
 
-    if (currentRouteConfig && currentRouteConfig.afterLeave) {
+    if (currentRouteConfig.afterLeave && this.story.length > 0) {
       currentRouteConfig.afterLeave(this, currentState)
     }
 
-    if (goToOptions.goingBack) {
-      this.story = this.story.slice(1)
-    }
-    else if (goToOptions.action === 'POP') {
-      this.story = [updatedRequest].concat(this.story.slice(1))
-    }
-    else {
-      this.story = [updatedRequest].concat(this.story)
-    }
+    this.story = updateStory(this.story, updatedRequest, goToOptions)
 
     if (this.eventHandlers.nav.length > 0) {
-      this.eventHandlers.nav.forEach((handler) => handler(this, goToOptions))
+      this.eventHandlers.nav.forEach((handler) => handler(this, updatedRequest, goToOptions))
     }
+
+    return updatedRequest
   }
 
   /**
@@ -222,23 +244,16 @@ export default class Router {
   }
 
   /**
-   * @param {Object} routes - List of routes: hooks, name, etc
    * @param {Object} options - options
-   * @param {{route: String, params: Object}} options.initialRequest - set the router initial route
+   * @param {Object} options.routes - List of routes: hooks, name, etc
    * @param {Object} options.app - anything you'd like to be able to access in the hooks
-   * @param {Object} options.historyPlugin
+   * @param {String} options.routeNotFound - path to a route that should handle "not found" cases
    */
-  constructor (routes = {}, options = {}) {
-    this.routes = routes
+  constructor (options = {}) {
+    this.routes = options.routes || {}
     this.options = options
     this.app = options.app
     this.goBack = this.goBack.bind(this)
     this.goTo = this.goTo.bind(this)
-    if (options.historyPlugin) {
-      this.history = options.historyPlugin.createHistory(this)
-    }
-    else {
-      this.goTo(options.initialRequest || {route: '/'})
-    }
   }
 }
