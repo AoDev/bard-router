@@ -1,16 +1,16 @@
-# Bard router
+# Bard mobx router
 
 [![npm version](https://badge.fury.io/js/bard-router.svg)](https://badge.fury.io/js/bard-router)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![Known Vulnerabilities](https://snyk.io/test/github/AoDev/bard-router/badge.svg)](https://snyk.io/test/github/AoDev/bard-router)
 
-**Routing solution for React/Mobx applications**.
+**More than just a routing solution, for React/Mobx applications**.
 
 ## Features summary
 
 * Router with a `very simple API`, and `navigation hooks`.
 * React components `<Link/>` and `<Route/>` that observe the router state and react accordingly.
-* HTML5 browser history plugin, automatically sync with the URL.  
-(no hash-based routing yet.)
+* A collection of plugins to make your life easier (history, window title, scroll, vms). [Plugins docs](https://github.com/AoDev/bard-router/tree/master/src/plugins).
 
 ## Current state: **Beta**
 
@@ -20,13 +20,11 @@ I am using it in my production react/mobx apps, in browsers and in Desktop apps 
 
 > In medieval Gaelic and British culture, a **"bard"** was a story teller.  They would talk about the people's journey in the world. A user interacting with an aplication is like a journey that the router allows to take, tell and remember.
 
-## Philosophy: decouple state and UI + app shell architecture
+## Philosophy: simplicity + decouple state and UI + app shell architecture
 
 Inspired by this article from mobx author: [decouple state and UI](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37), **bard-router** allows you to command your application models and select the right view to present the data while adhering to the original philosophy of React: `(appState) => UI`.
 
 The "opiniated side" of **bard-router** also comes from ideas of the [app shell architecture](https://developers.google.com/web/fundamentals/architecture/app-shell).
-
-Plus, I want the API to be as small and simple as possible. Routing should be a "no-brainer".
 
 ## Install
 
@@ -65,7 +63,7 @@ rules: [
 At high level it looks like this:
 
 1. You will provide a list of all your routes, with optional hooks.
-2. Instantiate the router, passing the routes and you mobx app store.
+2. Instantiate the router, passing the routes and you mobx root store.
 3. Make the router available in React context with `mobx Provider`.
 4. Use `<Link/>` and `<Route/>` in your React components.
 5. Use `router.goTo` when you need programmatic navigation.
@@ -90,29 +88,30 @@ const routes = {
 export default routes
 ```
 
-The routes request "path" is strictly reserved to display the right view, in other words: navigate the app shell, while any dynamic content, usually coming from a web API, will use the request params to display the corresponding data.
+The routes request "path" is strictly reserved to display the right view, in other words: __navigate the app shell__, while any dynamic content, usually coming from a web API, will use the request params to display the corresponding data.
 
-Eg: there is no route like: `/private/thing/:thingID/edit` but rather `/private/thing/edit?thingID=x`.
+Eg: with bard-router, there is no route like: `/private/thing/:thingID/edit` but rather `/private/thing/edit?thingID=x`.
 
 
-#### Hooks available
+#### Route hooks available
 
 - `beforeEnter`: called before entering route UI transition
 - `afterEnter`: called after entering route UI transition
 - `beforeLeave`: called before leaving route UI transition
 - `afterLeave`: called after leaving route UI transition
-- `onTheWay`: meant to process the navigation request before any hook
+- `intercept`: meant to process the navigation request before any hook (renamed from `onTheWay`)
+- `onTheWay`: DEPRECATED - same as intercept, will be removed in next version.
 
-### The `onTheWay` hook
+### The `intercept` hook
 
-Is specifically meant to alter navigation requests. So you can see it as some kind of interceptor and **it must always return a navigation request**.
+Is specifically meant to alter navigation requests. **It must always return a navigation request**.
 
-The typical use case is for handling **redirection**.
+The typical use case is for handling **redirection** or **setting default parameters**.
 
-Example, `checking if the user is logged-in`
+Example 1: `checking if the user is logged-in`
 ```js
   '/private': {
-    onTheWay (router, request) {
+    intercept (router, request) {
       const {appStore} = router.app
       if (!appStore.user.isAuthenticated()) {
         request.route = '/not-allowed'
@@ -132,7 +131,7 @@ const routes = {
   '/not-allowed': {},
 
   '/private': {
-    onTheWay (router, request) {
+    intercept (router, request) {
       // Example checking auth, you have access to your app store
       const {appStore} = router.app
       if (!appStore.user.isAuthenticated()) {
@@ -151,7 +150,7 @@ const routes = {
   },
 
   '/private/my-things/details': {
-    onTheWay (router, request) {
+    intercept (router, request) {
       // Example setting default params
       if (typeof request.thingID === 'undefined') {
         request.params.thingID = DEFAULT_ID
@@ -167,17 +166,26 @@ export default routes
 ### Router hooks
 As opposed to route specific hooks, the router hooks are handlers that you want to call any time there is a navigation event.
 
-* `'nav'`
-The handler is called with the router and the navigation options.
+* `beforeNav` (called before the view / navigation transition)
+* `afterNav` (called after the view / navigation was done)
+
+These handlers are called with an event object like this:
 
 ```js
-router.on('nav', handler(router, goToOptions)))
+router,             // reference to the router
+incomingRequest,    // the new request
+currentState,       // the current/previous request (depending on the point of view, after/before nav)
+goToOptions,        // goToOptions are mostly for internal purposes (like POP, goBack, ...)
 ```
 
-For example, a typical use case is to scroll back to top when the user navigates to a different section of your app.
+#### Examples
+
+A typical use case is to scroll back to top when the user navigates to a different section of your app.
+
+That's what the [scrollPlugin](https://github.com/AoDev/bard-router/tree/master/src/plugins) does internally.
 
 ```js
-router.on('nav', () => window.scrollTo(0, 0))
+router.on('aferNav', () => window.scrollTo(0, 0))
 ```
 
 ### Instantiating the router
@@ -208,9 +216,6 @@ const router = new MobxRouter(routes, {
     appStore,
   },
 })
-
-// Ask the browser to scroll back to top when switching view
-router.on('nav', () => window.scrollTo(0, 0))
 
 // <-- Typical React mount -->
 const render = (Component) => {
@@ -316,14 +321,14 @@ router.goBack()
 ## Recipes / FAQ
 
 ### How to redirect?
-Use the `onTheWay` hook in the relevant routes config and return a new request.
+Use the `intercept` hook in the relevant routes config and return a new request.
 
 Example
 
 ```js
 '/some-route': {
-  onTheWay (router, request) {
-    if (myRedirectionCheck(router.app.appStore)) {
+  intercept (router, request) {
+    if (shouldRedirect(router.app.appStore)) {
       request.route = '/somewhere-else'
     }
     return request
@@ -332,11 +337,7 @@ Example
 ```
 
 ### How to reset the window scroll when navigating?
-Use the `on('nav')` hook.
-
-```js
-router.on('nav', () => window.scrollTo(0, 0))
-```
+Use the [scrollPlugin](https://github.com/AoDev/bard-router/tree/master/src/plugins).
 
 ### How to handle 404 / not found?
 1. Set the `routeNotFound` option that should be the route to redirect to.
