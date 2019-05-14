@@ -1,8 +1,9 @@
-import Router, {splitPath, traverse, copyRequest} from './Router'
+import Router, {splitPath, diffPaths} from './Router'
+const {runInterceptors, copyRequest} = Router
 
 const testRoutes = {
   '/': {
-    onTheWay: () => ({params: {root: 'passed'}}),
+    intercept: () => ({params: {root: 'passed'}}),
     beforeEnter: jest.fn(),
     beforeLeave: jest.fn(),
     afterEnter: jest.fn(),
@@ -21,21 +22,21 @@ const testRoutes = {
     afterLeave: jest.fn(),
   },
   '/private': {
-    onTheWay: () => ({params: {auth: true}}),
+    intercept: () => ({params: {auth: true}}),
     beforeEnter: jest.fn(),
     beforeLeave: jest.fn(),
     afterEnter: jest.fn(),
     afterLeave: jest.fn(),
   },
   '/private/mystuff': {
-    onTheWay: () => ({params: {id: 1}, route: '/private/mystuff/details'}), // test redirect
+    intercept: () => ({params: {id: 1}, route: '/private/mystuff/details'}), // test redirect
     beforeEnter: jest.fn(),
     beforeLeave: jest.fn(),
     afterEnter: jest.fn(),
     afterLeave: jest.fn(),
   },
   '/private/mystuff/details': {
-    onTheWay: () => ({params: {details: 'ok'}}),
+    intercept: () => ({params: {details: 'ok'}}),
     beforeEnter: jest.fn(),
     beforeLeave: jest.fn(),
     afterEnter: jest.fn(),
@@ -43,7 +44,7 @@ const testRoutes = {
   },
 }
 
-describe('Router', () => {
+describe.only('Router', () => {
   let router
   beforeEach(() => {
     router = new Router({routes: testRoutes, initialRequest: {route: '/public'}})
@@ -72,6 +73,17 @@ describe('Router', () => {
     })
   })
 
+  describe('diffPaths', () => {
+    it('should return the path difference', () => {
+      const testPath1 = ['/', '/a', '/a/b', '/a/b/c']
+      const testPath2 = ['/', '/a', '/a/y', '/a/y/z']
+      const testPath3 = ['/']
+      expect(diffPaths(testPath1, testPath2)).toEqual(['/a/y', '/a/y/z'])
+      expect(diffPaths(testPath1, testPath3)).toEqual([])
+      expect(diffPaths(testPath1, testPath1)).toEqual([])
+    })
+  })
+
   describe('paramMatch()', () => {
     it('should compare params', () => {
       expect(router.paramMatch({}, {})).toBe(true)
@@ -83,28 +95,26 @@ describe('Router', () => {
     })
   })
 
-  describe('traverse()', () => {
+  describe('runInterceptors()', () => {
     it('should work with only root request', () => {
-      const testPath = '/'
+      const to = {route: '/'}
       router.set('routes', testRoutes)
-      const pathNodes = splitPath(testPath)
-      const request = {route: '/', params: {}}
-      expect(traverse(router, pathNodes, pathNodes[0], request)).toEqual({
+      expect(runInterceptors(router, to)).toEqual({
         params: {root: 'passed'},
         route: '/'
       })
     })
 
     it('should update the request with onTheWay hook', () => {
-      const testPath = '/private/mystuff'
+      const to = {route: '/private/mystuff', params: {}}
       router.set('routes', testRoutes)
-      const pathNodes = splitPath(testPath)
-      const request = {route: '/private/mystuff', params: {}}
-      expect(traverse(router, pathNodes, pathNodes[0], request)).toEqual({
+      expect(runInterceptors(router, to)).toEqual({
         params: {id: 1, auth: true, details: 'ok', root: 'passed'},
         route: '/private/mystuff/details'
       })
     })
+
+    test.todo('must pass a COPY of the request to the user interceptor')
   })
 
   describe('copyRequest()', () => {
@@ -118,17 +128,37 @@ describe('Router', () => {
     })
   })
 
+  describe('on()', () => {
+    it('should throw an error for invalid eventName', () => {
+      const spyFn = jest.fn().mockImplementation(() => {
+        router.on('wrong-event', () => {})
+      })
+      expect(spyFn).toThrowError('invalid "wrong-event" event')
+    })
+  })
+
+  describe('off()', () => {
+    it('should throw an error for invalid eventName', () => {
+      const spyFn = jest.fn().mockImplementation(() => {
+        router.off('wrong-event', () => {})
+      })
+      expect(spyFn).toThrowError('invalid "wrong-event" event')
+    })
+  })
+
   describe('goTo()', () => {
     it('should not modify the original request object', () => {
-      const request = {route: '/private/mystuff', params: {id: 1}}
-      const spy = jest.spyOn(Router, 'copyRequest')
+      const params = {id: 1}
+      const request = {route: '/private/mystuff', params}
       router.goTo(request)
-      expect(spy).toHaveBeenCalledWith(request)
+      expect(request.route).toBe('/private/mystuff')
+      expect(request.params).toBe(params)
+      expect(request.params).toEqual({id: 1})
     })
 
-    it('should use traverse to determine the final route and params', () => {
+    it('should use runInterceptors to determine the final route and params', () => {
       const request = {route: '/private/mystuff'}
-      const spy = jest.spyOn(Router, 'traverse')
+      const spy = jest.spyOn(Router, 'runInterceptors')
       router.goTo(request)
       expect(spy).toHaveBeenCalled()
     })
