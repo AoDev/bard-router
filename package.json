@@ -1,6 +1,6 @@
 {
   "name": "bard-router",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Routing solutions for applications",
   "homepage": "https://github.com/AoDev/bard-router",
   "main": "index.js",

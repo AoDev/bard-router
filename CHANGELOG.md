@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [1.0.0](https://github.com/AoDev/bard-router/compare/v0.3.0...v1.0.0) (2019-05-14)
+
+
+### Code Refactoring
+
+* **windowTitlePlugin:** route configuration change ([fbf7ce9](https://github.com/AoDev/bard-router/commit/fbf7ce9))
+
+
+### Features
+
+* added router beforeNav, afterNav events; route intercept hook ([fbbfa7c](https://github.com/AoDev/bard-router/commit/fbbfa7c))
+* **plugins:** added scrollPlugin to easily restore window scroll on nav ([2e63744](https://github.com/AoDev/bard-router/commit/2e63744))
+* **vmPlugin:** added vmPlugin for simple app architecture (experimental) ([1fa6917](https://github.com/AoDev/bard-router/commit/1fa6917))
+
+
+### BREAKING CHANGES
+
+* **windowTitlePlugin:** Before: the plugin expected a property {data: title}
+Now: the plugin expects a property {windowTitlePlugin: title}
+* 'nav' event has been removed and replaced by 'afterNav'
+
+
+
 # [0.3.0](https://github.com/AoDev/bard-router/compare/v0.2.1...v0.3.0) (2019-04-19)
 
 
