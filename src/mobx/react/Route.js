@@ -4,10 +4,14 @@ import {inject, observer} from 'mobx-react'
 
 function Route (props) {
   const {router, path, Component, ...otherProps} = props
-  return router.route.startsWith(path) ? <Component {...otherProps}/> : null
+  if (!router.route.startsWith(path)) {
+    return null
+  }
+  if (router.vmPlugin && router.vmPlugin.vmTree[path]) {
+    otherProps.vm = router.vmPlugin.vmTree[path]
+  }
+  return <Component {...otherProps}/>
 }
-
-export default inject('router')(observer(Route))
 
 Route.propTypes = {
   Component: PropTypes.func.isRequired,
@@ -17,3 +21,5 @@ Route.propTypes = {
   }),
   path: PropTypes.string.isRequired,
 }
+
+export default inject('router')(observer(Route))
