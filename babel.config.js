@@ -12,7 +12,7 @@ module.exports = {
         'loose': true
       }
     ],
-    ["@babel/plugin-transform-runtime"]
+    ['@babel/plugin-transform-runtime']
   ],
   'presets': [
     [

@@ -70,7 +70,7 @@ export function register (router, options = {}) {
    * Sync router -> browser history
    * = User is navigating using the app UI
    */
-  router.on('nav', (router, goToOptions) => {
+  router.on('afterNav', ({router, goToOptions}) => {
     const requestFromBrowser = requestFromLocation(history.location)
     if (isDifferentRequest(requestFromBrowser, router)) {
       if (goToOptions.goingBack) {

@@ -1,5 +1,18 @@
 const logger = console
 
+/**
+ * @param {Array} array
+ * @param {*} value
+ * @returns {boolean} true if value is in array
+ */
+function includes (array, value) {
+  return array.indexOf(value) > -1
+}
+
+/**
+ * @param {Array} array
+ * @param {*} value
+ */
 function removeFromArray (array, value) {
   const index = array.indexOf(value)
   if (index === -1) {
@@ -31,86 +44,18 @@ export function splitPath (path) {
 }
 
 /**
- * Clone a request object.
- * - Route is copied as is.
- * - Params first level props will be cloned.
- *   It is expected that params are only one level deep.
- * @param {Object} request
- * @param {String} request.route
- * @param {Object} request.params
+ * @param {string[]} pathNode1
+ * @param {string[]} pathNode2
  */
-export function copyRequest (request) {
-  return {
-    route: request.route,
-    params: request.params ? {...request.params} : {},
+export function diffPaths (pathNode1, pathNode2) {
+  let index = 0
+  while (
+    pathNode1[index] === pathNode2[index] &&
+    index < pathNode1.length && index < pathNode2.length
+  ) {
+    index++
   }
-}
-
-/**
- * This function is meant to update the routing request by executing all the "onTheWay" handlers
- * found in the path of the request.
- * Typical use is to redirect, check authentication, set default params, etc.
- * @param {{routes}} router
- * @param {String[]} pathNodes
- * @param {String} currentNode
- * @param {{route: String, params: Object}} request
- * @returns {{route: String, params: Object}} Updated request
- */
-export function traverse (router, pathNodes, currentNode, request) {
-  const {routes} = router
-  if (routes[currentNode]) {
-    let segmentIndex = pathNodes.indexOf(currentNode)
-    if (typeof routes[currentNode].onTheWay === 'function') {
-      const onTheWayResult = routes[currentNode].onTheWay(router, copyRequest(request))
-      if (onTheWayResult.params) {
-        Object.assign(request.params, onTheWayResult.params)
-      }
-      // REDIRECT?
-      if (typeof onTheWayResult.route === 'string' && onTheWayResult.route !== request.route) {
-        const newPathNodes = splitPath(onTheWayResult.route)
-        let newIndex = 0
-        while (
-          /**
-           * We look for the point of intersection and continue from there.
-           * If the old and new path have segments in common, we should not repeat the ones already done.
-           *
-           * eg: redirected from /private/object?{} to /private/object/details?{id: 1}
-           * where /private/object sets a default id.
-           * we do not want to reevaluate "/", "/private" and "/private/object"
-           * but want to evaluate /private/object/details?{id: 1}
-           */
-          newPathNodes[newIndex] === pathNodes[newIndex] &&
-          newIndex < newPathNodes.length && newIndex < pathNodes.length &&
-          newIndex < segmentIndex) {
-          newIndex++
-        }
-        request.route = onTheWayResult.route
-        pathNodes = newPathNodes
-        segmentIndex = newIndex // new current
-      }
-    }
-    // NEXT?
-    if (segmentIndex < pathNodes.length - 1) {
-      return traverse(router, pathNodes, pathNodes[segmentIndex + 1], request)
-    }
-  }
-  return request
-}
-
-/**
- * Update the internal history of the router
- * @param {*} story
- * @param {*} request
- * @param {*} goToOptions
- */
-function updateStory (story, request, goToOptions) {
-  if (goToOptions.goingBack) {
-    return story.slice(1)
-  }
-  if (goToOptions.action === 'POP') {
-    return [request].concat(story.slice(1))
-  }
-  return [request].concat(story)
+  return pathNode2.slice(index)
 }
 
 /**
@@ -122,47 +67,136 @@ export default class Router {
   params = {}
   story = []
   eventHandlers = {
-    nav: [],
+    beforeNav: [],
+    afterNav: [],
   }
 
-  static traverse = traverse
-  static copyRequest = copyRequest
-  static splitPath = splitPath
+  static routerEvents = ['beforeNav', 'afterNav']
 
   /**
-   * Navigate
+   * Clone a request object.
+   * for devs it's easier to not provide empty params when calling goTo(), so we provide default here
+   * - Route is copied as is.
+   * - Params first level props will be cloned.
+   *   It is expected that params are only one level deep.
+   * @param {Object} request
+   * @param {String} request.route
+   * @param {Object} request.params
+   */
+  static copyRequest (request) {
+    return {
+      route: request.route,
+      params: request.params ? {...request.params} : {},
+    }
+  }
+
+  /**
+   * Update the internal history of the router
+   * @param {Array.<{route: string, params: {}}>} story
+   * @param {{route: string, params: {}}} request
+   * @param {{action: string}} goToOptions
+   */
+  static updateStory (story, request, goToOptions) {
+    if (goToOptions.goingBack) {
+      return story.slice(1)
+    }
+    if (goToOptions.action === 'POP') {
+      return [request].concat(story.slice(1))
+    }
+    return [request].concat(story)
+  }
+
+  /**
+   * This function is meant to update the routing request by executing all the "intercept" handlers
+   * found in the path of the request.
+   * Typical use is to redirect, check authentication, set default params, etc.
+   * @param {{routes}} router
    * @param {{route: String, params: Object}} request
+   * @returns {{route: String, params: Object}} Updated request
+   */
+  static runInterceptors (router, request) {
+    const {routes} = router
+    let updatedRequest = Router.copyRequest(request)
+    let segments = splitPath(request.route)
+
+    while (segments.length > 0) {
+      const routeConfig = routes[segments[0]]
+
+      if (!routeConfig) {
+        return updatedRequest
+      }
+
+      segments = segments.slice(1)
+
+      const interceptor = routeConfig.onTheWay || routeConfig.intercept // TODO: remove in next version
+      if (typeof interceptor === 'function') {
+        /**
+         * Copy the request before passing it to the interceptor to avoid trouble when user modifies it.
+         */
+        const interceptorReq = interceptor(router, Router.copyRequest(updatedRequest))
+        if (interceptorReq.params) {
+          Object.assign(updatedRequest.params, interceptorReq.params)
+        }
+        /**
+         * In case of redirect, we look for the point of intersection and continue from there.
+         * If the old and new path have segments in common, we should not repeat the ones already done.
+         */
+        if (typeof interceptorReq.route === 'string' && interceptorReq.route !== updatedRequest.route) {
+          segments = diffPaths(splitPath(updatedRequest.route), splitPath(interceptorReq.route))
+          updatedRequest.route = interceptorReq.route
+        }
+      }
+    }
+    return updatedRequest
+  }
+
+  /**
+   * Return the redirection request to "not found" based on options
+   * @param {*} routes
+   * @param {{routeNotFound: string}} options
+   */
+  static redirectNotFound (routes, options) {
+    if (options.routeNotFound) {
+      if (!routes[options.routeNotFound]) {
+        // Prevent an infinite loop
+        throw new Error(`No corresponding route to "routeNotFound". Got ${options.routeNotFound}`)
+      }
+      return {route: options.routeNotFound, params: {}}
+    }
+    else {
+      logger.warn('404 - route not found. Consider routeNotFound option.')
+      return {route: '/', params: {}}
+    }
+  }
+
+  /**
+   * Process a navigation request
+   * @param {{route: String, params: Object}} request
+   * @param {{goingBack: boolean, action: string}?} goToOptions
    */
   goTo (request, goToOptions = {}) {
+    let routerHookArgs
     const currentState = {
       route: this.route,
       params: this.params,
     }
+
     const currentRouteConfig = this.routes[currentState.route]
-
-    // for dev it's easier to not provide empty params when calling goTo(), so we provide default here
-    let updatedRequest = Router.copyRequest(request)
-
-    const pathNodes = Router.splitPath(request.route)
-    updatedRequest = Router.traverse(this, pathNodes, pathNodes[0], updatedRequest)
+    let updatedRequest = Router.runInterceptors(this, request)
 
     let routeConfig = this.routes[updatedRequest.route]
 
     if (!routeConfig) {
-      // TODO: should probable handle not found in the "traverse"
-      if (this.options.routeNotFound) {
-        if (!this.routes[this.options.routeNotFound]) {
-          // Prevent an infinite loop
-          throw new Error(`No corresponding route to "routeNotFound". Falling back to '/'. Got ${this.options.routeNotFound}`)
-        }
-        updatedRequest = {route: this.options.routeNotFound, params: {}}
-        routeConfig = this.routes[updatedRequest.route]
-      }
-      else {
-        logger.warn('404 - route not found. Consider routeNotFound option.')
-        updatedRequest = {route: '/', params: {}}
-        routeConfig = this.routes[updatedRequest.route]
-      }
+      updatedRequest = Router.redirectNotFound(this.routes, this.options)
+      routeConfig = this.routes[updatedRequest.route]
+    }
+
+    if (this.eventHandlers.afterNav.length > 0 || this.eventHandlers.beforeNav.length > 0) {
+      routerHookArgs = {router: this, incomingRequest: updatedRequest, currentState, goToOptions}
+    }
+
+    if (this.eventHandlers.beforeNav.length > 0) {
+      this.eventHandlers.beforeNav.forEach((handler) => handler(routerHookArgs))
     }
 
     if (routeConfig.beforeEnter) {
@@ -185,10 +219,10 @@ export default class Router {
       currentRouteConfig.afterLeave(this, currentState)
     }
 
-    this.story = updateStory(this.story, updatedRequest, goToOptions)
+    this.story = Router.updateStory(this.story, updatedRequest, goToOptions)
 
-    if (this.eventHandlers.nav.length > 0) {
-      this.eventHandlers.nav.forEach((handler) => handler(this, updatedRequest, goToOptions))
+    if (this.eventHandlers.afterNav.length > 0) {
+      this.eventHandlers.afterNav.forEach((handler) => handler(routerHookArgs))
     }
 
     return updatedRequest
@@ -209,24 +243,24 @@ export default class Router {
 
   /**
    * Attach router hook.
-   * @param {String} eventName - Valid events: 'nav'
-   * @param {Function} handler - Will be called like: handler(router, goToOptions)
+   * @param {[beforeNav', 'afterNav']} eventName
+   * @param {Function} handler - called as: handler(router, goToOptions)
    */
   on (eventName, handler) {
-    if (eventName !== 'nav') {
-      throw new Error(`unknown ${eventName} event`)
+    if (!includes(Router.routerEvents, eventName)) {
+      throw new Error(`invalid "${eventName}" event`)
     }
     this.eventHandlers[eventName].push(handler)
   }
 
   /**
    * Remove router hook.
-   * @param {String} eventName - Valid events: 'nav'
+   * @param {['beforeNav', 'afterNav']} eventName
    * @param {Function} handler - Anonymous functions can not be removed
    */
   off (eventName, handler) {
-    if (eventName !== 'nav') {
-      throw new Error(`unknown ${eventName} event`)
+    if (!includes(Router.routerEvents, eventName)) {
+      throw new Error(`invalid "${eventName}" event`)
     }
     removeFromArray(this.eventHandlers[eventName], handler)
   }

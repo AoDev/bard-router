@@ -49,9 +49,9 @@ function setWindowTitleFromRouter (router, options) {
  * @param {{defaultTitle: String, prefix: String}} options
  */
 function register (router, options = {}) {
-  const handler = setWindowTitleFromRouter.bind(null, router, options)
-  router.on('nav', handler)
-  return () => router.off('nav', handler)
+  const afterNavHandler = setWindowTitleFromRouter.bind(null, router, options)
+  router.on('afterNav', afterNavHandler)
+  return () => router.off('afterNav', afterNavHandler)
 }
 
 export default {
