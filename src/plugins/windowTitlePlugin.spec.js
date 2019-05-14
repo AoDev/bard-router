@@ -5,17 +5,17 @@ const titleSpy = jest.fn()
 
 const routes = {
   '/': {
-    data: {
+    windowTitlePlugin: {
       title: 'Root',
     },
   },
   '/some-page': {
-    data: {
+    windowTitlePlugin: {
       title: 'Some page',
     },
   },
   '/some-other-page': {
-    data: {
+    windowTitlePlugin: {
       title (router) {
         titleSpy(router)
         return 'Some other page'
@@ -62,7 +62,7 @@ describe('WindowTitlePlugin', () => {
       const unregister = windowTitlePlugin.register(routerMock)
       unregister()
       const spyArgs = routerMock.off.mock.calls[0]
-      expect(spyArgs[0]).toBe('nav')
+      expect(spyArgs[0]).toBe('afterNav')
       // fragile way to test that it passed the right handler
       expect(spyArgs[1].name.endsWith('setWindowTitleFromRouter')).toBe(true)
     })

@@ -6,7 +6,7 @@
  */
 function setWindowTitleFromRouter (router, options) {
   const routeConfig = router.routes[router.route]
-  const titleConfig = routeConfig && routeConfig.data && routeConfig.data.title
+  const titleConfig = routeConfig && routeConfig.windowTitlePlugin && routeConfig.windowTitlePlugin.title
 
   if (typeof titleConfig === 'function') {
     let title = titleConfig(router)
@@ -24,7 +24,7 @@ function setWindowTitleFromRouter (router, options) {
  * Register the plugin with a router instance.
  *
  * How to use:
- * - Add a data.title field to any route config.
+ * - Add a windowTitlePlugin.title field to any route config.
  * - title can be either a string or a function.
  * - if it's a function, it will be called with the router as argument.
  *
@@ -33,10 +33,10 @@ function setWindowTitleFromRouter (router, options) {
  * // myroutes.js
  * {
  *   '/some-page': {
- *     data: {title: 'Some page'}
+ *     windowTitlePlugin: {title: 'Some page'}
  *   },
  *   '/some-other-page': {
- *     data: {
+ *     windowTitlePlugin: {
  *       title (router) {
  *         const {appStore} = router.app
  *         return `Some other page - ${appStore.someValue}`
