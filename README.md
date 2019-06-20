@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/bard-router.svg)](https://badge.fury.io/js/bard-router)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-[![Known Vulnerabilities](https://snyk.io/test/github/AoDev/bard-router/badge.svg)](https://snyk.io/test/github/AoDev/bard-router)
+[![Known Vulnerabilities](https://snyk.io/test/github/AoDev/bard-router/badge.svg)](https://snyk.io/test/github/AoDev/bard-router) [![Join the chat at https://gitter.im/AoDev/bard-router](https://badges.gitter.im/AoDev/bard-router.svg)](https://gitter.im/AoDev/bard-router?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 **More than just a routing solution, for React/Mobx applications**.
 
