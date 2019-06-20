@@ -4,7 +4,6 @@
       "about_router"
     ],
     "Router and routes": [
-      "doc1",
       "route_hooks",
       "router_hooks"
     ],
