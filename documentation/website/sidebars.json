@@ -1,0 +1,25 @@
+{
+  "docs": {
+    "About Bard router": [
+      "about_router"
+    ],
+    "Router and routes": [
+      "doc1",
+      "route_hooks",
+      "router_hooks"
+    ],
+    "React UI Components": [
+      "component_route",
+      "component_link"
+    ],
+    "Plugins": [
+      "plugins_scroll",
+      "plugins_window_title",
+      "plugins_html5_history",
+      "plugins_vm"
+    ]
+  },
+  "docs-other": {
+    "First Category": ["doc4", "doc5"]
+  }
+}
