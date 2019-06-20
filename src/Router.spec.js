@@ -114,6 +114,29 @@ describe.only('Router', () => {
       })
     })
 
+    it('should handle complex redirect situation', () => {
+      // This is a test case that models an actual router bug
+      // where runInterceptor was wrongly skipping some paths.
+      const routes = {
+        '/': {},
+        '/a': {},
+        '/a/b': {
+          intercept: jest.fn().mockImplementation(() => ({route: '/a/b/c/d', params: {}}))
+        },
+        '/a/b/c': {
+          intercept: jest.fn().mockImplementation((router, request) => request)
+        },
+        '/a/b/c/d': {
+          intercept: jest.fn().mockImplementation((router, request) => request)
+        },
+      }
+      router.set('routes', routes)
+      runInterceptors(router, {route: '/a/b/c'})
+      expect(routes['/a/b'].intercept).toHaveBeenCalled()
+      expect(routes['/a/b/c'].intercept).toHaveBeenCalled()
+      expect(routes['/a/b/c/d'].intercept).toHaveBeenCalled()
+    })
+
     test.todo('must pass a COPY of the request to the user interceptor')
   })
 

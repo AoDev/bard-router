@@ -116,14 +116,15 @@ export default class Router {
    */
   static runInterceptors (router, request) {
     const {routes} = router
-    let updatedRequest = Router.copyRequest(request)
+    let requestCopy = Router.copyRequest(request)
     let segments = splitPath(request.route)
 
     while (segments.length > 0) {
-      const routeConfig = routes[segments[0]]
+      const currentSegment = segments[0]
+      const routeConfig = routes[currentSegment]
 
       if (!routeConfig) {
-        return updatedRequest
+        return requestCopy
       }
 
       segments = segments.slice(1)
@@ -133,21 +134,21 @@ export default class Router {
         /**
          * Copy the request before passing it to the interceptor to avoid trouble when user modifies it.
          */
-        const interceptorReq = interceptor(router, Router.copyRequest(updatedRequest))
+        const interceptorReq = interceptor(router, Router.copyRequest(requestCopy))
         if (interceptorReq.params) {
-          Object.assign(updatedRequest.params, interceptorReq.params)
+          Object.assign(requestCopy.params, interceptorReq.params)
         }
         /**
          * In case of redirect, we look for the point of intersection and continue from there.
          * If the old and new path have segments in common, we should not repeat the ones already done.
          */
-        if (typeof interceptorReq.route === 'string' && interceptorReq.route !== updatedRequest.route) {
-          segments = diffPaths(splitPath(updatedRequest.route), splitPath(interceptorReq.route))
-          updatedRequest.route = interceptorReq.route
+        if (typeof interceptorReq.route === 'string' && interceptorReq.route !== requestCopy.route) {
+          segments = diffPaths(splitPath(currentSegment), splitPath(interceptorReq.route))
+          requestCopy.route = interceptorReq.route
         }
       }
     }
-    return updatedRequest
+    return requestCopy
   }
 
   /**
