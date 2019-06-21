@@ -21,6 +21,10 @@
   margin-top: 16px;
 }
 
+a {
+  color: #0072ea;
+}
+
 @media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
 }
 

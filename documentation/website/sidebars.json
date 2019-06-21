@@ -1,7 +1,8 @@
 {
   "docs": {
     "About Bard router": [
-      "about_router"
+      "about_router",
+      "getting_started"
     ],
     "Router and routes": [
       "route_hooks",

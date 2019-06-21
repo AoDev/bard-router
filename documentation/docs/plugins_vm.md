@@ -29,6 +29,8 @@ const router = new Router({
 vmPlugin.register(router)
 ```
 
+> **You must provide your root store at `app.rootStore`** so that it can be injected in your VM.  
+
 ### 2. Make the router available through context
 
 ```js
