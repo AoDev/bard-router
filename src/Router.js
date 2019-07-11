@@ -156,7 +156,7 @@ export default class Router {
    * @param {*} routes
    * @param {{routeNotFound: string}} options
    */
-  static redirectNotFound (routes, options) {
+  static redirectNotFound (routes, options, routePathNotFound) {
     if (options.routeNotFound) {
       if (!routes[options.routeNotFound]) {
         // Prevent an infinite loop
@@ -165,7 +165,7 @@ export default class Router {
       return {route: options.routeNotFound, params: {}}
     }
     else {
-      logger.warn('404 - route not found. Consider routeNotFound option.')
+      logger.warn(`404 - ${routePathNotFound} route not found. Consider routeNotFound option.`)
       return {route: '/', params: {}}
     }
   }
@@ -188,7 +188,7 @@ export default class Router {
     let routeConfig = this.routes[updatedRequest.route]
 
     if (!routeConfig) {
-      updatedRequest = Router.redirectNotFound(this.routes, this.options)
+      updatedRequest = Router.redirectNotFound(this.routes, this.options, updatedRequest.route)
       routeConfig = this.routes[updatedRequest.route]
     }
 
