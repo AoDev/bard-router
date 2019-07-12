@@ -1,4 +1,4 @@
-import {diffPaths, splitPath} from '../Router'
+import {diffPaths, splitPath} from '../utils'
 
 /**
  * @param {{router: {vmPlugin: {vmTree: *}},incomingRequest: {route: string}, currentState: {route: string}}} - beforeNav event

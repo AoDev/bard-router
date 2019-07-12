@@ -9,7 +9,7 @@ function setWindowTitleFromRouter (router, options) {
   const titleConfig = routeConfig && routeConfig.windowTitlePlugin && routeConfig.windowTitlePlugin.title
 
   if (typeof titleConfig === 'function') {
-    let title = titleConfig(router)
+    const title = titleConfig(router)
     window.document.title = options.prefix ? options.prefix + title : title
   }
   else if (typeof titleConfig === 'string' || typeof titleConfig === 'number') {

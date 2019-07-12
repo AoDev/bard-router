@@ -25,16 +25,18 @@ const routes = {
 class RouterMock {
   route = '/'
   params = {}
+  on = jest.fn()
+  off = jest.fn()
+  routes = routes
+
+  app = {
+    rootStore: {}
+  }
+
   goTo = jest.fn().mockImplementation((request) => {
     this.route = request.route
     this.params = request.params
   })
-  on = jest.fn()
-  off = jest.fn()
-  routes = routes
-  app = {
-    rootStore: {}
-  }
 }
 
 describe('vmPlugin', () => {
