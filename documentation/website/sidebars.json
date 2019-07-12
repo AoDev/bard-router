@@ -17,6 +17,9 @@
       "plugins_window_title",
       "plugins_html5_history",
       "plugins_vm"
+    ],
+    "How to's": [
+      "faq"
     ]
   },
   "docs-other": {

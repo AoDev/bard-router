@@ -35,10 +35,10 @@ sidebar_label: "Window title plugin"
 
 ```js
 // where you bootstrap your app_ (eg: Rootstore)
-import MobxRouter from 'bard-router/src/mobx/MobxRouter'
-import windowTitlePlugin from 'bard-router/src/plugins/windowTitlePlugin'
+import {Router} from 'bard-router'
+import windowTitlePlugin from 'bard-router/lib/plugins/windowTitlePlugin'
 
-const router = new MobxRouter({...})
+const router = new Router({...})
 
 windowTitlePlugin.register(this.router, {
   defaultTitle: 'Bard',

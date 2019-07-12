@@ -6,7 +6,7 @@ sidebar_label: "VM plugin (experimental)"
 
 > **The `vmPlugin` is meant to facilitate the [decouple state and UI](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37) philosophy.**
 
-It is experimental and could change or disappear. It allows to greatly simplify a React app architecture.
+It is experimental and could change or disappear. It allows to simplify a React app architecture at "page" level.
 
 ## What are VM (view models) for?
 

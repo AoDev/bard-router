@@ -14,7 +14,7 @@ If router state matches the path, Component is displayed.
 
 ```js
 import React from 'react'
-import Link from 'bard-router/mobx/react/Route'
+import {Route} from 'bard-router'
 import MyComponent from './MyComponent'
 
 // MyComponent will render only if router state

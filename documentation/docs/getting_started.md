@@ -15,11 +15,11 @@ Dependencies needed: `react`, `mobx`, `mobx-react`.
 ### Source and transpiled versions available
 You have the choice to import the source (ES6, JSX, not transpiled) or use a transpiled version.
 
-- transpiled version is available under `lib`  
-eg: `const Router = require('bard-router/lib/Router')`
+- transpiled version
+eg: `const {Router} = require('bard-router')`
 
-- ES6 version is available under `src`  
-eg: `import Router from 'bard-router/src/Router'`
+- Not transpiled version is available under `src`  
+eg: `import {Router} from 'bard-router'`
 
 If you use the source, you will have to transpile it yourself.  
 eg: if you use Webpack:
@@ -30,7 +30,7 @@ rules: [
     test: /\.jsx?$/,
     use: ['babel-loader'],
     include: [
-      /bard-router/,
+      /bard-router/, // <--
       path.resolve(__dirname, 'src'),
     ],
   },
@@ -68,14 +68,14 @@ export default routes
 
 ### About the route path
 
-The route "path" is reserved to display the right view, in other words: __navigate the app shell__. Each key, like `/private/my-things` simply will have one corresponding view. Any dynamic content, will use the request params to display the corresponding data.
+The route "path" is reserved to display the right view, in other words: __navigate the app shell__. Each key, like `/private/my-things` will have one corresponding view. Any dynamic content will use the request params to display the corresponding data.
 
-In summary, with bard-router, there is no route like: `/private/thing/:thingID/edit` but rather `/private/thing/edit?thingID=x`. This makes things simpler to reason about.
+In summary, with bard-router, there is no route like: `/private/thing/:thingID/edit` but rather `/private/thing/edit?thingID=x`. This makes things simpler.
 
 ## Instantiate the router
 
 ### Accessing your app in the router hooks
-To have access to any variables you'd like in the router hooks, like your app store for example, you set it through the `app` option. See below.
+To have access to any variables you'd like in the router hooks, like your app store for example, you can set any data through the `app` option. See below.
 
 ### Instantiation example
 
@@ -84,8 +84,7 @@ import React from 'react'
 import reactDom from 'react-dom'
 import * as mobx from 'mobx'
 import {Provider} from 'mobx-react'
-import {AppContainer} from 'react-hot-loader'
-import MobxRouter from 'bard-router/lib/mobx/MobxRouter' // <--
+import {Router} from 'bard-router' // <--
 import App from './App'
 import RootStore from './stores/RootStore'
 import routes from './routes'
@@ -105,11 +104,9 @@ const router = new MobxRouter(routes, {
 // <-- Typical React mount -->
 const render = (Component) => {
   reactDom.render(
-    <AppContainer>
-      <Provider router={router} appStore={appStore} uiStore={uiStore}>
-        <Component />
-      </Provider>
-    </AppContainer>,
+    <Provider router={router} appStore={appStore} uiStore={uiStore}>
+      <Component />
+    </Provider>,
     document.getElementById('root')
   )
 }

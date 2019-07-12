@@ -13,7 +13,7 @@ You can manually control this behaviour by setting `active={true|false}`.
 #### Link component example
 ```js
 import React from 'react'
-import Link from 'bard-router/mobx/react/Link'
+import {Link} from 'bard-router'
 
 export default function SomeTextWithLink () {
   return (
