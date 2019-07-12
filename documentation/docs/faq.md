@@ -4,6 +4,8 @@ title: "How-to's / FAQ"
 sidebar_label: "How-to's / FAQ"
 ---
 
+Simple solutions for challenges that one faces usually with routing.
+
 ## How to redirect?
 Use the `intercept` hook in the relevant routes config and return a new request.
 

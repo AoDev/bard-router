@@ -4,6 +4,8 @@ title: "<Link/> component"
 sidebar_label: "<Link/>"
 ---
 
+The Link component lets your users navigate through your UI.
+
 `Link` gets two props: `to` and `params` that represents a routing request.
 
 To help with typical UI patterns, you can automatically get an `active` CSS class on your link if it matches the current route, by setting the `autoActive` attribute.

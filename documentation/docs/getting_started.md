@@ -4,6 +4,8 @@ title: "Getting started"
 sidebar_label: "Getting started"
 ---
 
+Bard Mobx Router is pretty simple to use, here is an overview of the steps to follow.
+
 ## Install
 
 ```
