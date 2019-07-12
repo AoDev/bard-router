@@ -26,6 +26,7 @@
   },
 
   "rules": {
+    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true}],
     "brace-style": [2, "stroustrup"],
     "comma-dangle": 0,
     "import/extensions": 1,
