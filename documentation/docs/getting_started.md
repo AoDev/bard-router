@@ -21,7 +21,7 @@ You have the choice to import the source (ES6, JSX, not transpiled) or use a tra
 eg: `const {Router} = require('bard-router')`
 
 - Not transpiled version is available under `src`  
-eg: `import {Router} from 'bard-router'`
+eg: `import {Router} from 'bard-router/src'`
 
 If you use the source, you will have to transpile it yourself.  
 eg: if you use Webpack:
