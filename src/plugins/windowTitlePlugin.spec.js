@@ -1,5 +1,5 @@
 import windowTitlePlugin from './windowTitlePlugin'
-import Router from '../Router'
+import Router from '../BardRouter'
 
 const titleSpy = jest.fn()
 
@@ -16,10 +16,10 @@ const routes = {
   },
   '/some-other-page': {
     windowTitlePlugin: {
-      title (router) {
+      title(router) {
         titleSpy(router)
         return 'Some other page'
-      }
+      },
     },
   },
 }

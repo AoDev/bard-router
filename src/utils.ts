@@ -1,17 +1,14 @@
 /**
- * @param {Array} array
- * @param {*} value
- * @returns {boolean} true if value is in array
+ * Check if a value is in an array
  */
-export function includes (array, value) {
+export function includes<V>(array: any[], value: V) {
   return array.indexOf(value) > -1
 }
 
 /**
- * @param {Array} array
- * @param {*} value
+ * Remove a value from an array
  */
-export function removeFromArray (array, value) {
+export function removeFromArray<V>(array: any[], value: V) {
   const index = array.indexOf(value)
   if (index === -1) {
     return array
@@ -22,17 +19,17 @@ export function removeFromArray (array, value) {
 /**
  * @see splitPath
  */
-export function splitPathReducer (acc, step, index) {
+export function splitPathReducer(acc: any[], step: string, index: number) {
   acc.push(index === 0 ? '' : acc[index - 1] + '/' + step)
   return acc
 }
 
 /**
  * Splits a path like "/private/data/..."
+ *
  * into ["/", "/private", "/private/data", "/private/data/..."]
- * @param {String} path
  */
-export function splitPath (path) {
+export function splitPath(path: string): string[] {
   if (path === '/') {
     return ['/']
   }
@@ -42,14 +39,13 @@ export function splitPath (path) {
 }
 
 /**
- * @param {string[]} pathNode1
- * @param {string[]} pathNode2
  */
-export function diffPaths (pathNode1, pathNode2) {
+export function diffPaths(pathNode1: string[], pathNode2: string[]) {
   let index = 0
   while (
     pathNode1[index] === pathNode2[index] &&
-    index < pathNode1.length && index < pathNode2.length
+    index < pathNode1.length &&
+    index < pathNode2.length
   ) {
     index++
   }

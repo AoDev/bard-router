@@ -1,23 +1,41 @@
 import {diffPaths, splitPath} from '../utils'
+import BardRouter from '../BardRouter'
 
-/**
- * @param {{router: {vmPlugin: {vmTree: *}},incomingRequest: {route: string}, currentState: {route: string}}} - beforeNav event
- */
-export function vmPluginInstantiateVM ({router, incomingRequest, currentState}) {
+type routeParam = {[key: string]: string | number}
+
+interface IRequest {
+  route?: string
+  params?: routeParam
+}
+
+export function vmPluginInstantiateVM({
+  router,
+  incomingRequest,
+  currentState,
+}: {
+  router: BardRouter
+  incomingRequest: IRequest
+  currentState: IRequest
+}) {
   const nodes = diffPaths(splitPath(currentState.route), splitPath(incomingRequest.route))
   nodes.forEach((node) => {
     const routeConfig = router.routes[node]
     if (routeConfig.vmPlugin) {
       const {vmClass} = routeConfig.vmPlugin
-      router.vmPlugin.vmTree[node] = new vmClass(router.app.rootStore) // eslint-disable-line
+      router.vmPlugin.vmTree[node] = new vmClass(router.app.rootStore)
     }
   })
 }
 
-/**
- * @param {{router: {vmPlugin: {vmTree: *}},incomingRequest: {route: string}, currentState: {route: string}}} - afterNav event
- */
-export function vmPluginCleanupVM ({router, incomingRequest, currentState}) {
+export function vmPluginCleanupVM({
+  router,
+  incomingRequest,
+  currentState,
+}: {
+  router: BardRouter
+  incomingRequest: IRequest
+  currentState: IRequest
+}) {
   const nodes = diffPaths(splitPath(incomingRequest.route), splitPath(currentState.route))
   const {vmTree} = router.vmPlugin
   nodes.forEach((node) => {
@@ -27,10 +45,7 @@ export function vmPluginCleanupVM ({router, incomingRequest, currentState}) {
   })
 }
 
-/**
- * @param {*} router
- */
-function register (router) {
+function register(router: BardRouter) {
   router.on('beforeNav', vmPluginInstantiateVM)
   router.on('afterNav', vmPluginCleanupVM)
 

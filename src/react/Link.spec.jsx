@@ -3,32 +3,45 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 const routerMock = {
-  route: '/',
-  params: {},
+  app: {},
+  currentRouteConfig: {},
+  eventHandlers: {beforeNav: [], afterNav: []},
+  goBack: jest.fn(),
   goTo: jest.fn(),
+  off: jest.fn(),
+  on: jest.fn(),
+  onAfterNav: [],
+  onBeforeNav: [],
+  options: {},
   paramMatch: jest.fn(),
+  params: {},
+  route: '/',
+  routes: {},
+  story: [],
 }
 
 describe('<Link/>', () => {
   it('should create a link element', () => {
-    const wrapper = shallow(<Link to="/some/route" router={routerMock}/>)
+    const wrapper = shallow(<Link to="/some/route" router={routerMock} />)
     const linkElement = wrapper.find('a')
     expect(linkElement).toHaveLength(1)
   })
 
   describe('the "active" property', () => {
     it('should add the "active" css class when true', () => {
-      const wrapper = shallow(<Link to="/some/route" className="link" active router={routerMock}/>)
+      const wrapper = shallow(<Link to="/some/route" className="link" active router={routerMock} />)
       const linkElement = wrapper.find('a')
       expect(linkElement.prop('className')).toBe('link active')
     })
 
     it('should NOT add the "active" css class when false or when undefined', () => {
-      let wrapper = shallow(<Link to="/some/route" className="link" active={false} router={routerMock}/>)
+      let wrapper = shallow(
+        <Link to="/some/route" className="link" active={false} router={routerMock} />
+      )
       let linkElement = wrapper.find('a')
       expect(linkElement.prop('className')).toBe('link')
 
-      wrapper = shallow(<Link to="/some/route" className="link" router={routerMock}/>)
+      wrapper = shallow(<Link to="/some/route" className="link" router={routerMock} />)
       linkElement = wrapper.find('a')
       expect(linkElement.prop('className')).toBe('link')
     })
@@ -38,7 +51,9 @@ describe('<Link/>', () => {
     it('should add the "active" css class when the router active route matches the link route', () => {
       routerMock.paramMatch.mockImplementation(() => true)
       routerMock.route = '/some/route'
-      const wrapper = shallow(<Link to="/some/route" className="link" autoActive router={routerMock}/>)
+      const wrapper = shallow(
+        <Link to="/some/route" className="link" autoActive router={routerMock} />
+      )
       const linkElement = wrapper.find('a')
       expect(linkElement.prop('className')).toBe('link active')
     })
@@ -51,9 +66,9 @@ describe('<Link/>', () => {
   describe('clicking the link', () => {
     it('should call the router.goTo method with the link route and params', () => {
       const props = {to: '/some/route', params: {}}
-      const wrapper = shallow(<Link {...props} className="link" router={routerMock}/>)
+      const wrapper = shallow(<Link {...props} className="link" router={routerMock} />)
       const dummyEvent = {
-        preventDefault () {},
+        preventDefault() {},
       }
       wrapper.simulate('click', dummyEvent)
       expect(routerMock.goTo).toHaveBeenCalledWith({route: props.to, params: props.params})

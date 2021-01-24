@@ -4,12 +4,10 @@ class SomePageMockVM {
   destroyVM = jest.fn()
 }
 
-class OtherPageMockVM {
-}
+class OtherPageMockVM {}
 
 const routes = {
-  '/': {
-  },
+  '/': {},
   '/some-page': {
     vmPlugin: {
       vmClass: SomePageMockVM,
@@ -30,7 +28,7 @@ class RouterMock {
   routes = routes
 
   app = {
-    rootStore: {}
+    rootStore: {},
   }
 
   goTo = jest.fn().mockImplementation((request) => {
@@ -92,19 +90,27 @@ describe('vmPlugin', () => {
   describe('vmPluginInstantiateVM', () => {
     it('should instantiate the corresponding VMs', () => {
       vmPluginInstantiateVM({
-        router: routerMock, incomingRequest: {route: '/some-page'}, currentState: {route: '/'}
+        router: routerMock,
+        incomingRequest: {route: '/some-page'},
+        currentState: {route: '/'},
       })
-      expect(routerMock.vmPlugin.vmTree['/some-page']).toBeInstanceOf(routes['/some-page'].vmPlugin.vmClass)
+      expect(routerMock.vmPlugin.vmTree['/some-page']).toBeInstanceOf(
+        routes['/some-page'].vmPlugin.vmClass
+      )
     })
   })
 
   describe('vmPluginCleanupVM', () => {
     it('should cleanup VMs', () => {
       vmPluginInstantiateVM({
-        router: routerMock, incomingRequest: {route: '/some-page'}, currentState: {route: '/'}
+        router: routerMock,
+        incomingRequest: {route: '/some-page'},
+        currentState: {route: '/'},
       })
       vmPluginCleanupVM({
-        router: routerMock, incomingRequest: {route: '/some-other-page'}, currentState: {route: '/some-page'}
+        router: routerMock,
+        incomingRequest: {route: '/some-other-page'},
+        currentState: {route: '/some-page'},
       })
       expect(routerMock.vmPlugin.vmTree['/some-page'].destroyVM).toHaveBeenCalled()
     })

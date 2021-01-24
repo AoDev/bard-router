@@ -1,8 +1,6 @@
+import BardRouter from '../BardRouter'
 
-/**
- * @param {*} router
- */
-function register (router, window) {
+function register(router: BardRouter, window: {scrollTo: (x: number, y: number) => void}) {
   const scrollPluginHandler = () => window.scrollTo(0, 0)
 
   router.on('afterNav', scrollPluginHandler)

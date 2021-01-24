@@ -1,46 +1,54 @@
 module.exports = {
-  'plugins': [
+  plugins: [
     [
       '@babel/plugin-proposal-class-properties',
       {
-        'loose': true
-      }
+        loose: true,
+      },
     ],
     [
       '@babel/plugin-proposal-object-rest-spread',
       {
-        'loose': true
-      }
+        loose: true,
+      },
     ],
-    ['@babel/plugin-transform-runtime']
+    [
+      'add-module-exports',
+      {
+        addDefaultProperty: true,
+      },
+    ],
+    ['@babel/plugin-transform-runtime'],
   ],
-  'presets': [
+  presets: [
     [
       '@babel/preset-env',
       {
-        'targets': {
-          'chrome': 61,
-          'electron': '2.0.9'
+        targets: {
+          browsers: '> 5%',
         },
-        'modules': 'commonjs',
-        'useBuiltIns': 'usage'
-      }
+        modules: 'commonjs',
+        useBuiltIns: 'usage',
+        corejs: 3,
+      },
     ],
-    '@babel/preset-react'
+    '@babel/typescript',
+    '@babel/preset-react',
   ],
-  'env': {
-    'production': {
-      'ignore': ['**/*.spec.js']
+  env: {
+    production: {
+      ignore: ['**/*.spec.js'],
     },
-    'test': {
-      'presets': [
+    test: {
+      presets: [
         [
           '@babel/preset-env',
           {
-            'modules': 'commonjs'
-          }
-        ]
-      ]
-    }
-  }
+            modules: 'commonjs',
+          },
+        ],
+        '@babel/typescript',
+      ],
+    },
+  },
 }

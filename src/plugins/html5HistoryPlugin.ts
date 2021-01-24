@@ -1,11 +1,10 @@
 import {createBrowserHistory} from 'history'
+import BardRouter, {IRequest} from '../BardRouter'
 
 /**
  * Check if two objects have same properties, one level deep
- * @param {*} obj1
- * @param {*} obj2
  */
-function isEqual (obj1, obj2) {
+function isEqual(obj1: any, obj2: any) {
   const obj1Keys = Object.keys(obj1)
   const obj2Keys = Object.keys(obj2)
   if (obj1Keys.length !== obj2Keys.length) {
@@ -23,30 +22,38 @@ function isEqual (obj1, obj2) {
  * @param {*} location
  * @returns {{route: string, params}}
  */
-function requestFromLocation (location) {
+function requestFromLocation(location: {pathname: string; search: string}) {
   const queryString = location.search.slice(1)
   return {
     route: location.pathname,
-    params: queryString === ''
-      ? {}
-      : location.search.slice(1).split('&').reduce((acc, nameValue) => {
-        const [name, value] = nameValue.split('=')
-        acc[name] = value
-        return acc
-      }, {})
+    params:
+      queryString === ''
+        ? {}
+        : location.search
+            .slice(1)
+            .split('&')
+            .reduce((acc, nameValue) => {
+              const [name, value] = nameValue.split('=')
+              acc[name] = value
+              return acc
+            }, {} as Record<string, string | number>),
   }
 }
 
 /**
  * @param {*} request
  */
-function locationFromRequest (request) {
-  const location = {
-    pathname: request.route
+function locationFromRequest(request: IRequest) {
+  const location: {search?: string; pathname: string} = {
+    pathname: request.route,
   }
   const paramsKeys = Object.keys(request.params)
   if (paramsKeys.length > 0) {
-    location.search = '?' + Object.keys(request.params).map((key) => `${key}=${request.params[key]}`).join('&')
+    location.search =
+      '?' +
+      Object.keys(request.params)
+        .map((key) => `${key}=${request.params[key]}`)
+        .join('&')
   }
   return location
 }
@@ -55,15 +62,13 @@ function locationFromRequest (request) {
  * @param {*} request1
  * @param {*} request2
  */
-function isDifferentRequest (request1, request2) {
+function isDifferentRequest(request1: IRequest, request2: IRequest) {
   return request1.route !== request2.route || !isEqual(request1.params, request2.params)
 }
 
 /**
- * @param {*} router
- * @returns {History}
  */
-export function register (router, options = {}) {
+export function register(router: BardRouter) {
   const history = createBrowserHistory()
 
   /**
@@ -75,8 +80,7 @@ export function register (router, options = {}) {
     if (isDifferentRequest(requestFromBrowser, router)) {
       if (goToOptions.goingBack) {
         history.goBack()
-      }
-      else {
+      } else {
         history.push(locationFromRequest(router.story[0]))
       }
     }
