@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.0](https://github.com/AoDev/bard-router/compare/v1.0.3...v2.0.0-beta.0) (2021-01-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* Now needs mobx 6+
+
+* rewrite in typescript + update deps for mobx 6 + prettier ([d2fd51f](https://github.com/AoDev/bard-router/commit/d2fd51f5759cb55627a7611b47e7c39182919b1b))
+
 ### [1.0.3](https://github.com/AoDev/bard-router/compare/v1.0.2...v1.0.3) (2020-03-13)
 
 
