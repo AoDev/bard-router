@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/AoDev/bard-router/compare/v2.0.0-beta.0...v2.0.0) (2021-03-10)
+
+
+### Bug Fixes
+
+* **goBack:** was missing mobx decoration as action ([ebb3468](https://github.com/AoDev/bard-router/commit/ebb3468b76222902c4b74b874ab50dde6bba5947))
+
 ## [2.0.0-beta.0](https://github.com/AoDev/bard-router/compare/v1.0.3...v2.0.0-beta.0) (2021-01-24)
 
 
