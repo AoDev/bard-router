@@ -269,11 +269,12 @@ export default class BardRouter {
     this.app = options.app
     this.eventHandlers = {beforeNav: [], afterNav: []}
     mobx.makeObservable(this, {
-      story: mobx.observable.ref,
-      route: mobx.observable,
-      params: mobx.observable.ref,
-      goTo: mobx.action.bound,
       currentRouteConfig: mobx.computed,
+      goBack: mobx.action.bound,
+      goTo: mobx.action.bound,
+      params: mobx.observable.ref,
+      route: mobx.observable,
+      story: mobx.observable.ref,
     })
   }
 }
