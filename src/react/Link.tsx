@@ -1,16 +1,13 @@
 import {observer, inject} from 'mobx-react'
-import React from 'react'
+import React, {LinkHTMLAttributes} from 'react'
 import BardRouter from '../BardRouter'
 
-type linkParams = {[key: string]: string | number}
-
-interface ILinkProps {
+interface ILinkProps extends LinkHTMLAttributes<HTMLAnchorElement> {
   active?: boolean
   autoActive?: boolean
   className?: string
-  onClick?: (to: string | null, event: React.MouseEvent) => void
-  params: linkParams
-  router: BardRouter
+  params: Record<string, string | number>
+  router?: BardRouter
   to: string
 }
 
@@ -31,14 +28,14 @@ export class Link extends React.Component<ILinkProps> {
     return router.route.startsWith(to) && router.paramMatch(router.params, params)
   }
 
-  onClick(event: React.MouseEvent) {
+  onClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     event.preventDefault()
     const {onClick, to, router, params} = this.props
     if (to) {
       router.goTo({route: to, params})
     }
     if (onClick) {
-      onClick(to || null, event)
+      onClick(event)
     }
   }
 
@@ -58,4 +55,8 @@ export class Link extends React.Component<ILinkProps> {
   }
 }
 
-export default inject('router')(observer(Link))
+const InjectedLink = inject((stores: {router: BardRouter}) => ({
+  router: stores.router as BardRouter,
+}))(observer(Link))
+
+export default InjectedLink

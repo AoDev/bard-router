@@ -4,7 +4,7 @@ import {inject, observer} from 'mobx-react'
 import BardRouter from '../BardRouter'
 
 interface IRouteProps {
-  router: BardRouter
+  router?: BardRouter
   path: string
   Component: React.ComponentType
 }
@@ -33,4 +33,8 @@ Route.propTypes = {
   path: PropTypes.string.isRequired,
 }
 
-export default inject('router')(observer(Route))
+const InjectedRoute = inject((stores: {router: BardRouter}) => ({
+  router: stores.router as BardRouter,
+}))(observer(Route))
+
+export default InjectedRoute
