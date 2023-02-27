@@ -4,6 +4,7 @@ module.exports = {
     ['@babel/plugin-proposal-object-rest-spread', {loose: true}],
     ['@babel/plugin-proposal-private-methods', {loose: true}],
     ['add-module-exports', {addDefaultProperty: true}],
+    ['@babel/plugin-proposal-private-property-in-object', {loose: true}],
     ['@babel/plugin-transform-runtime'],
   ],
   presets: [

@@ -1,12 +1,5 @@
 import {diffPaths, splitPath} from '../utils'
-import BardRouter from '../BardRouter'
-
-type routeParam = {[key: string]: string | number}
-
-interface IRequest {
-  route?: string
-  params?: routeParam
-}
+import BardRouter, {IRequest} from '../BardRouter'
 
 export function vmPluginInstantiateVM({
   router,
@@ -22,6 +15,8 @@ export function vmPluginInstantiateVM({
     const routeConfig = router.routes[node]
     if (routeConfig.vmPlugin) {
       const {vmClass} = routeConfig.vmPlugin
+      // TODO fix type
+      //@ts-ignore
       router.vmPlugin.vmTree[node] = new vmClass(router.app.rootStore)
     }
   })

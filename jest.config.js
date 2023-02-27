@@ -7,7 +7,7 @@ module.exports = {
   resetModules: true,
   restoreMocks: true,
   globals: {
-    'NODE_ENV': 'test',
+    NODE_ENV: 'test',
   },
   setupFilesAfterEnv: [path.join('<rootDir>', 'test-setup.js')],
   testEnvironment: 'node',

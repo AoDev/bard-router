@@ -43,16 +43,14 @@ const testRoutes = {
   },
 }
 
-describe.skip('Router', () => {
+describe('Router', () => {
   let router
   beforeEach(() => {
     router = new Router({routes: testRoutes})
-    router.goTo({route: '/public'})
   })
 
   describe('initial state', () => {
     it('should use root "/" and empty params as default for initial request', () => {
-      router = new Router()
       expect(router.route).toBe('/')
       expect(router.params).toEqual({})
     })
@@ -64,7 +62,6 @@ describe.skip('Router', () => {
       expect(router.paramMatch({id: 1}, {})).toBe(true)
       expect(router.paramMatch({}, {id: 1})).toBe(true)
       expect(router.paramMatch({id: 1}, {id: 1, name: 'John'})).toBe(true)
-
       expect(router.paramMatch({id: 1}, {id: 2})).toBe(false)
     })
   })

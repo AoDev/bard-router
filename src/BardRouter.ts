@@ -2,11 +2,11 @@ import {includes, removeFromArray, splitPath, diffPaths} from './utils'
 import * as mobx from 'mobx'
 const logger = console
 
-type routeParam = {[key: string]: string | number}
+export type RouteParam = Record<string, string | number>
 
 export interface IRequest {
   route?: string
-  params?: routeParam
+  params?: RouteParam
 }
 
 interface IGoToOptions {
@@ -14,49 +14,45 @@ interface IGoToOptions {
   action?: string
 }
 
-type routeNavHook = (router: BardRouter, request: IRequest) => void
+type RouteNavHook = (router: BardRouter, request: IRequest) => void
 
-type routerNavHookArgs = {
+type RouterNavHookArgs = {
   router: BardRouter
   incomingRequest: IRequest
   currentState: IRequest
   goToOptions: IGoToOptions
 }
 
-type routerNavHookHandler = (args: routerNavHookArgs) => void
+type routerNavHookHandler = (args: RouterNavHookArgs) => void
 
-interface IRouteConfig {
-  beforeEnter?: routeNavHook
-  afterEnter?: routeNavHook
-  beforeLeave?: routeNavHook
-  afterLeave?: routeNavHook
+export interface IRouteConfig {
+  beforeEnter?: RouteNavHook
+  afterEnter?: RouteNavHook
+  beforeLeave?: RouteNavHook
+  afterLeave?: RouteNavHook
   intercept?: (router: BardRouter, request: IRequest) => IRequest
   vmPlugin?: {vmClass: any}
   windowTitlePlugin?: {title: string | ((router: BardRouter) => string)}
 }
 
-interface IRouteConfigDict {
-  [name: string]: IRouteConfig
-}
-
 interface IRouterOptions {
   routeNotFound?: string
-  routes?: IRouteConfigDict
-  app?: any
+  routes?: Record<string, IRouteConfig>
+  app?: unknown
 }
 
 export default class BardRouter {
   routes: {[name: string]: IRouteConfig}
   vmPlugin?: any
   route = '/'
-  params = {}
+  params: Record<string, string | number> = {}
   story: IRequest[] = []
   options: IRouterOptions
   eventHandlers: {beforeNav: routerNavHookHandler[]; afterNav: routerNavHookHandler[]} = {
     beforeNav: [],
     afterNav: [],
   }
-  app: any
+  app: unknown
 
   static routerEvents = ['beforeNav', 'afterNav']
 
@@ -141,7 +137,7 @@ export default class BardRouter {
    * @param {{routeNotFound: string}} options
    */
   static redirectNotFound(
-    routes: IRouteConfigDict,
+    routes: Record<string, IRouteConfig>,
     options: IRouterOptions,
     routePathNotFound: string
   ) {
@@ -165,7 +161,7 @@ export default class BardRouter {
    * Process a navigation request
    */
   goTo(request: IRequest, goToOptions: IGoToOptions = {}) {
-    let routerHookArgs: routerNavHookArgs
+    let routerHookArgs: RouterNavHookArgs
 
     const currentState = {
       route: this.route,
@@ -252,7 +248,7 @@ export default class BardRouter {
    * Helps to check if some params match the current router state params
    * @returns `true` if params1 is a subset of params2
    */
-  paramMatch(params1: routeParam, params2: routeParam) {
+  paramMatch(params1: RouteParam, params2: RouteParam) {
     return !Object.keys(params2).some(
       (key) => typeof params1[key] !== 'undefined' && params1[key] !== params2[key]
     )
