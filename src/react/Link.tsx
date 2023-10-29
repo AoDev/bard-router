@@ -1,62 +1,60 @@
-import {observer, inject} from 'mobx-react'
-import React, {LinkHTMLAttributes} from 'react'
-import BardRouter from '../BardRouter'
+import React, {useCallback} from 'react'
+import Router, {RouteParam} from '../Router'
+import injectRouter from './injectRouter'
 
-interface ILinkProps extends LinkHTMLAttributes<HTMLAnchorElement> {
+interface ILinkProps extends React.LinkHTMLAttributes<HTMLAnchorElement> {
   active?: boolean
   autoActive?: boolean
   className?: string
-  params: Record<string, string | number>
-  router?: BardRouter
+  params?: RouteParam
+  router: Router
   to: string
 }
 
-export class Link extends React.Component<ILinkProps> {
-  static defaultProps = {
-    params: {},
-    autoActive: false,
-  }
-
-  constructor(props: ILinkProps) {
-    super(props)
-    this.onClick = this.onClick.bind(this)
-    this.checkIfActive = this.checkIfActive.bind(this)
-  }
-
-  checkIfActive() {
-    const {router, params, to} = this.props
-    return router.route.startsWith(to) && router.paramMatch(router.params, params)
-  }
-
-  onClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
-    event.preventDefault()
-    const {onClick, to, router, params} = this.props
-    if (to) {
-      router.goTo({route: to, params})
-    }
-    if (onClick) {
-      onClick(event)
-    }
-  }
-
-  render() {
-    const {to, active, params, onClick, router, className, autoActive, ...otherProps} = this.props
-    let cssClasses = className || ''
-
-    if ((autoActive && this.checkIfActive()) || active === true) {
-      cssClasses += ' active'
-    }
-
-    return (
-      <a href={to} onClick={this.onClick} {...otherProps} className={cssClasses}>
-        {this.props.children}
-      </a>
-    )
-  }
+/**
+ * Helper to set an "active" css class on the link when current location matches
+ */
+function isLinkActive(router: Router, to: string, params: RouteParam) {
+  return router.route.startsWith(to) && router.paramMatch(router.params, params)
 }
 
-const InjectedLink = inject((stores: {router: BardRouter}) => ({
-  router: stores.router as BardRouter,
-}))(observer(Link))
+export function Link({
+  to,
+  active,
+  params = {},
+  onClick,
+  router,
+  className = '',
+  autoActive = false,
+  ...otherProps
+}: ILinkProps) {
+  const handleOnClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      event.preventDefault()
+      router.goTo(to, params)
+      if (onClick) {
+        onClick(event)
+      }
+    },
+    [to, params, onClick]
+  )
+
+  let cssClasses = className
+
+  if ((autoActive && isLinkActive(router, to, params)) || active === true) {
+    cssClasses += ' active'
+  }
+
+  return (
+    <a href={to} onClick={handleOnClick} {...otherProps} className={cssClasses}>
+      {otherProps.children}
+    </a>
+  )
+}
+
+/**
+ * Link component with the router already available
+ */
+const InjectedLink = injectRouter(Link) as unknown as React.FC<Omit<ILinkProps, 'router'>>
 
 export default InjectedLink

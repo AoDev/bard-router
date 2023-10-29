@@ -1,6 +1,5 @@
-const path = require('path')
-
 module.exports = {
+  preset: 'ts-jest',
   clearMocks: true,
   noStackTrace: true,
   resetMocks: true,
@@ -9,7 +8,6 @@ module.exports = {
   globals: {
     NODE_ENV: 'test',
   },
-  setupFilesAfterEnv: [path.join('<rootDir>', 'test-setup.js')],
-  testEnvironment: 'node',
+  testEnvironment: 'jest-environment-jsdom',
   verbose: true, // Set to false to see console log during tests.
 }

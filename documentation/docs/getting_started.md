@@ -1,7 +1,7 @@
 ---
 id: getting_started
-title: "Getting started"
-sidebar_label: "Getting started"
+title: 'Getting started'
+sidebar_label: 'Getting started'
 ---
 
 Bard Mobx Router is pretty simple to use, here is an overview of the steps to follow.
@@ -15,28 +15,10 @@ npm install bard-router -DE
 Dependencies needed: `react`, `mobx`, `mobx-react`.
 
 ### Source and transpiled versions available
+
 You have the choice to import the source (ES6, JSX, not transpiled) or use a transpiled version.
 
-- transpiled version
-eg: `const {Router} = require('bard-router')`
-
-- Not transpiled version is available under `src`  
-eg: `import {Router} from 'bard-router/src'`
-
-If you use the source, you will have to transpile it yourself.  
-eg: if you use Webpack:
-
-```js
-rules: [
-  {
-    test: /\.jsx?$/,
-    use: ['babel-loader'],
-    include: [
-      /bard-router/, // <--
-      path.resolve(__dirname, 'src'),
-    ],
-  },
-```
+`import {Router} from 'bard-router'`
 
 ## Usage React + mobx
 
@@ -53,6 +35,7 @@ At high level it looks like this:
 Create a module that exports a map of your routes with optional hooks.
 
 `routes.js`
+
 ```js
 const routes = {
   '/': {}, // route config
@@ -61,7 +44,7 @@ const routes = {
 
   '/private': {},
   '/private/my-things': {},
-  '/private/my-things/details': {}
+  '/private/my-things/details': {},
 
   // ...
 }
@@ -70,13 +53,14 @@ export default routes
 
 ### About the route path
 
-The route "path" is reserved to display the right view, in other words: __navigate the app shell__. Each key, like `/private/my-things` will have one corresponding view. Any dynamic content will use the request params to display the corresponding data.
+The route "path" is reserved to display the right view, in other words: **navigate the app shell**. Each key, like `/private/my-things` will have one corresponding view. Any dynamic content will use the request params to display the corresponding data.
 
 In summary, with bard-router, there is no route like: `/private/thing/:thingID/edit` but rather `/private/thing/edit?thingID=x`. This makes things simpler.
 
 ## Instantiate the router
 
 ### Accessing your app in the router hooks
+
 To have access to any variables you'd like in the router hooks, like your app store for example, you can set any data through the `app` option. See below.
 
 ### Instantiation example

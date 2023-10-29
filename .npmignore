@@ -1,2 +1,9 @@
 documentation
-*.spec.js
+**/*.spec.*
+src
+.eslint*
+**/test
+.prettier*
+.github*
+babel*
+jest*

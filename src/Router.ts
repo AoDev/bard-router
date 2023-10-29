@@ -1,12 +1,11 @@
 import {includes, removeFromArray, splitPath, diffPaths} from './utils'
 import * as mobx from 'mobx'
-const logger = console
 
 export type RouteParam = Record<string, string | number>
 
 export interface IRequest {
-  route?: string
-  params?: RouteParam
+  route: string
+  params: RouteParam
 }
 
 interface IGoToOptions {
@@ -14,36 +13,42 @@ interface IGoToOptions {
   action?: string
 }
 
-type RouteNavHook = (router: BardRouter, request: IRequest) => void
+type RouteNavHook = (request: IRequest, router: Router) => void
 
-type RouterNavHookArgs = {
-  router: BardRouter
+type RouterHookArgs = {
+  router: Router
   incomingRequest: IRequest
   currentState: IRequest
   goToOptions: IGoToOptions
 }
 
-type routerNavHookHandler = (args: RouterNavHookArgs) => void
+type routerNavHookHandler = (args: RouterHookArgs) => void
 
 export interface IRouteConfig {
   beforeEnter?: RouteNavHook
   afterEnter?: RouteNavHook
   beforeLeave?: RouteNavHook
   afterLeave?: RouteNavHook
-  intercept?: (router: BardRouter, request: IRequest) => IRequest
-  vmPlugin?: {vmClass: any}
-  windowTitlePlugin?: {title: string | ((router: BardRouter) => string)}
+  intercept?: (request: IRequest, router: Router) => Partial<IRequest>
+  windowTitlePlugin?: string | ((router: Router) => string)
 }
 
 interface IRouterOptions {
   routeNotFound?: string
   routes?: Record<string, IRouteConfig>
-  app?: unknown
 }
 
-export default class BardRouter {
-  routes: {[name: string]: IRouteConfig}
-  vmPlugin?: any
+export interface IBardRouter {
+  routes: Record<string, IRouteConfig>
+  route: string
+  params: RouteParam
+  story: IRequest[]
+  options: IRouterOptions
+  eventHandlers: {beforeNav: routerNavHookHandler[]; afterNav: routerNavHookHandler[]}
+}
+
+export default class Router implements IBardRouter {
+  routes: Record<string, IRouteConfig>
   route = '/'
   params: Record<string, string | number> = {}
   story: IRequest[] = []
@@ -52,7 +57,6 @@ export default class BardRouter {
     beforeNav: [],
     afterNav: [],
   }
-  app: unknown
 
   static routerEvents = ['beforeNav', 'afterNav']
 
@@ -87,70 +91,34 @@ export default class BardRouter {
    * This function is meant to update the routing request by executing all the "intercept" handlers
    * found in the path of the request.
    * Typical use is to redirect, check authentication, set default params, etc.
-   * @param {BardRouter} router
-   * @param {{route: String, params: Object}} request
-   * @returns {{route: String, params: Object}} Updated request
    */
-  static runInterceptors(router: BardRouter, request: IRequest) {
+  static runInterceptors(router: Router, request: IRequest) {
     const {routes} = router
-    const requestCopy = BardRouter.copyRequest(request)
+    const requestCopy = Router.copyRequest(request)
     let segments = splitPath(request.route)
 
     while (segments.length > 0) {
       const currentSegment = segments[0]
       const routeConfig = routes[currentSegment]
-
-      if (!routeConfig) {
-        return requestCopy
-      }
-
       segments = segments.slice(1)
 
-      const interceptor = routeConfig.intercept
+      const interceptor = routeConfig?.intercept
+
       if (typeof interceptor === 'function') {
-        /**
-         * Copy the request before passing it to the interceptor to avoid trouble when user modifies it.
-         */
-        const interceptorReq = interceptor(router, BardRouter.copyRequest(requestCopy))
-        if (interceptorReq.params) {
-          Object.assign(requestCopy.params, interceptorReq.params)
+        // Copy the request before passing it to the interceptor to avoid trouble when user modifies it.
+        const updatedReq = interceptor(Router.copyRequest(requestCopy), router)
+        if (updatedReq.params) {
+          Object.assign(requestCopy.params, updatedReq.params)
         }
-        /**
-         * In case of redirect, we look for the point of intersection and continue from there.
-         * If the old and new path have segments in common, we should not repeat the ones already done.
-         */
-        if (
-          typeof interceptorReq.route === 'string' &&
-          interceptorReq.route !== requestCopy.route
-        ) {
-          segments = diffPaths(splitPath(currentSegment), splitPath(interceptorReq.route))
-          requestCopy.route = interceptorReq.route
+        // In case of redirect, we look for the point of intersection and continue from there.
+        // If the old and new path have segments in common, we should not repeat the ones already done.
+        if (typeof updatedReq.route === 'string' && updatedReq.route !== requestCopy.route) {
+          segments = diffPaths(splitPath(currentSegment), splitPath(updatedReq.route))
+          requestCopy.route = updatedReq.route
         }
       }
     }
     return requestCopy
-  }
-
-  /**
-   * Return the redirection request to "not found" based on options
-   * @param {*} routes
-   * @param {{routeNotFound: string}} options
-   */
-  static redirectNotFound(
-    routes: Record<string, IRouteConfig>,
-    options: IRouterOptions,
-    routePathNotFound: string
-  ) {
-    if (options.routeNotFound) {
-      if (!routes[options.routeNotFound]) {
-        // Prevent an infinite loop
-        throw new Error(`No corresponding route to "routeNotFound". Got ${options.routeNotFound}`)
-      }
-      return {route: options.routeNotFound, params: {}}
-    } else {
-      logger.warn(`404 - ${routePathNotFound} route not found. Consider routeNotFound option.`)
-      return {route: '/', params: {}}
-    }
   }
 
   get currentRouteConfig() {
@@ -160,23 +128,16 @@ export default class BardRouter {
   /**
    * Process a navigation request
    */
-  goTo(request: IRequest, goToOptions: IGoToOptions = {}) {
-    let routerHookArgs: RouterNavHookArgs
+  goTo(route: string, params = {}, goToOptions: IGoToOptions = {}) {
+    const currentState = {route: this.route, params: this.params}
+    const request: IRequest = {route, params}
+    const currentRouteConfig: IRouteConfig | null = this.routes[currentState.route] || null
+    const updatedRequest = Router.runInterceptors(this, request)
+    const routeConfig: IRouteConfig | null = updatedRequest.route
+      ? this.routes[updatedRequest.route]
+      : null
 
-    const currentState = {
-      route: this.route,
-      params: this.params,
-    }
-
-    const currentRouteConfig = this.routes[currentState.route]
-    let updatedRequest = BardRouter.runInterceptors(this, request)
-
-    let routeConfig = this.routes[updatedRequest.route]
-
-    if (!routeConfig) {
-      updatedRequest = BardRouter.redirectNotFound(this.routes, this.options, updatedRequest.route)
-      routeConfig = this.routes[updatedRequest.route]
-    }
+    let routerHookArgs: RouterHookArgs
 
     if (this.eventHandlers.afterNav.length > 0 || this.eventHandlers.beforeNav.length > 0) {
       routerHookArgs = {router: this, incomingRequest: updatedRequest, currentState, goToOptions}
@@ -186,31 +147,25 @@ export default class BardRouter {
       this.eventHandlers.beforeNav.forEach((handler) => handler(routerHookArgs))
     }
 
-    if (routeConfig.beforeEnter) {
-      routeConfig.beforeEnter(this, updatedRequest)
-    }
+    routeConfig?.beforeEnter?.(updatedRequest, this)
 
-    if (currentRouteConfig.beforeLeave && this.story.length > 0) {
-      currentRouteConfig.beforeLeave(this, updatedRequest)
+    if (this.story.length > 0) {
+      currentRouteConfig?.beforeLeave?.(updatedRequest, this)
     }
 
     // From that point, the view is transitionning
     this.route = updatedRequest.route
     this.params = updatedRequest.params
 
-    if (routeConfig.afterEnter) {
-      routeConfig.afterEnter(this, currentState)
+    routeConfig?.afterEnter?.(currentState, this)
+
+    if (this.story.length > 0) {
+      currentRouteConfig?.afterLeave?.(currentState, this)
     }
 
-    if (currentRouteConfig.afterLeave && this.story.length > 0) {
-      currentRouteConfig.afterLeave(this, currentState)
-    }
+    this.story = Router.updateStory(this.story, updatedRequest, goToOptions)
 
-    this.story = BardRouter.updateStory(this.story, updatedRequest, goToOptions)
-
-    if (this.eventHandlers.afterNav.length > 0) {
-      this.eventHandlers.afterNav.forEach((handler) => handler(routerHookArgs))
-    }
+    this.eventHandlers.afterNav.forEach((handler) => handler(routerHookArgs))
 
     return updatedRequest
   }
@@ -220,7 +175,8 @@ export default class BardRouter {
    */
   goBack() {
     if (this.story.length > 1) {
-      this.goTo(this.story[1], {action: 'POP', goingBack: true})
+      const {route, params} = this.story[1]
+      this.goTo(route, params, {action: 'POP', goingBack: true})
     }
   }
 
@@ -238,7 +194,7 @@ export default class BardRouter {
    * @param {Function} handler - Anonymous functions can not be removed
    */
   off(eventName: 'beforeNav' | 'afterNav', handler: routerNavHookHandler) {
-    if (!includes(BardRouter.routerEvents, eventName)) {
+    if (!includes(Router.routerEvents, eventName)) {
       throw new Error(`invalid "${eventName}" event`)
     }
     removeFromArray(this.eventHandlers[eventName], handler)
@@ -256,13 +212,11 @@ export default class BardRouter {
 
   /**
    * @param options.routes - List of routes: hooks, name, etc
-   * @param options.app - anything you'd like to be able to access in the hooks
    * @param options.routeNotFound - path to a route that should handle "not found" cases
    */
   constructor(options: IRouterOptions = {}) {
     this.routes = options.routes || {}
     this.options = options
-    this.app = options.app
     this.eventHandlers = {beforeNav: [], afterNav: []}
     mobx.makeObservable(this, {
       currentRouteConfig: mobx.computed,

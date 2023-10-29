@@ -1,65 +1,43 @@
 import windowTitlePlugin from './windowTitlePlugin'
-import Router from '../BardRouter'
+import Router, {IRouteConfig} from '../Router'
+import RouterMock from '../../test/RouterMock'
 
 const titleSpy = jest.fn()
 
-const routes = {
+const routes: Record<string, IRouteConfig> = {
   '/': {
-    windowTitlePlugin: {
-      title: 'Root',
-    },
+    windowTitlePlugin: 'Root',
   },
   '/some-page': {
-    windowTitlePlugin: {
-      title: 'Some page',
-    },
+    windowTitlePlugin: 'Some page',
   },
   '/some-other-page': {
-    windowTitlePlugin: {
-      title(router) {
-        titleSpy(router)
-        return 'Some other page'
-      },
+    windowTitlePlugin: (router: Router) => {
+      titleSpy(router)
+      return 'Some other page'
     },
   },
-}
-
-class RouterMock {
-  _setWindowTitleFromRouter = jest.fn()
-  on = jest.fn()
-  off = jest.fn()
 }
 
 describe('WindowTitlePlugin', () => {
-  let router
-
-  beforeAll(() => {
-    // mock window
-    global.window = {
-      document: {
-        title: '',
-      },
-    }
-  })
-
-  afterAll(() => {
-    global.window = undefined
-  })
+  let router: Router
+  let windowMock = {document: {title: ''}}
 
   beforeEach(() => {
-    router = new Router({routes, initialRequest: {route: '/'}})
-    windowTitlePlugin.register(router)
+    router = new Router({routes})
+    windowMock = {document: {title: ''}}
+    windowTitlePlugin.register(router, windowMock)
   })
 
   describe('register', () => {
     it('should return a function to unregister the plugin', () => {
-      const unregister = windowTitlePlugin.register(router)
+      const unregister = windowTitlePlugin.register(router, windowMock)
       expect(unregister).toBeInstanceOf(Function)
     })
 
     test('the unregister function should remove the handler from the router listeners', () => {
       const routerMock = new RouterMock()
-      const unregister = windowTitlePlugin.register(routerMock)
+      const unregister = windowTitlePlugin.register(routerMock, windowMock)
       unregister()
       const spyArgs = routerMock.off.mock.calls[0]
       expect(spyArgs[0]).toBe('afterNav')
@@ -70,17 +48,18 @@ describe('WindowTitlePlugin', () => {
 
   describe('when title is a string', () => {
     it('should set the window title with the string', () => {
-      router.goTo({route: '/'})
-      expect(window.document.title).toBe('Root')
-      router.goTo({route: '/some-page'})
-      expect(window.document.title).toBe('Some page')
+      router.goTo('/')
+      expect(windowMock.document.title).toBe('Root')
+      router.goTo('/some-page')
+      expect(windowMock.document.title).toBe('Some page')
     })
   })
+
   describe('when title is a function', () => {
     it('should set the window title by calling the function', () => {
-      router.goTo({route: '/some-other-page'})
+      router.goTo('/some-other-page')
       expect(titleSpy).toHaveBeenCalledWith(router)
-      expect(window.document.title).toBe('Some other page')
+      expect(windowMock.document.title).toBe('Some other page')
     })
   })
 })

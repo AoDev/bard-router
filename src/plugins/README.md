@@ -1,9 +1,8 @@
 # Plugins for bard-router
 
-* [windowTitlePlugin](#windowTitlePlugin)
-* [html5HistoryPlugin](#html5HistoryPlugin)
-* [scrollPlugin](#scrollPlugin)
-* [vmPlugin](#vmPlugin)
+- [windowTitlePlugin](#windowTitlePlugin)
+- [html5HistoryPlugin](#html5HistoryPlugin)
+- [scrollPlugin](#scrollPlugin)
 
 ---
 

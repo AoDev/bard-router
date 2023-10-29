@@ -1,3 +1,7 @@
-export {default as Router} from './BardRouter'
+export {default as Router} from './Router'
 export {default as Link} from './react/Link'
 export {default as Route} from './react/Route'
+export {default as html5HistoryPlugin} from './plugins/html5HistoryPlugin'
+export {default as scrollPlugin} from './plugins/scrollPlugin'
+export {default as windowTitlePlugin} from './plugins/windowTitlePlugin'
+export type {IRequest, IRouteConfig} from './Router'

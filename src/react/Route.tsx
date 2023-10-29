@@ -1,9 +1,9 @@
 import React from 'react'
-import {inject, observer} from 'mobx-react'
-import BardRouter from '../BardRouter'
+import Router from '../Router'
+import injectRouter from './injectRouter'
 
 export type RouteProps<T extends Record<string, unknown>> = {
-  router?: BardRouter
+  router?: Router
   path: string
   Component: React.ComponentType<T>
 } & T
@@ -13,16 +13,11 @@ export function Route<T extends Record<string, unknown>>(props: RouteProps<T>) {
   if (!router?.route.startsWith(path)) {
     return null
   }
-  if (router.vmPlugin && router.vmPlugin.vmTree[path] && 'vm' in otherProps) {
-    // @ts-ignore
-    otherProps.vm = router.vmPlugin.vmTree[path]
-  }
-  // @ts-ignore
+  // @ts-expect-error TODO Dont know how to solve this type issue
   return <Component {...otherProps} />
 }
 
-const InjectedRoute = inject((stores: {router: BardRouter}) => ({
-  router: stores.router as BardRouter,
-}))(observer(Route))
-
-export default InjectedRoute
+/**
+ * Route component with the router already available
+ */
+export default injectRouter(Route)

@@ -1,7 +1,7 @@
-import Router from './BardRouter'
+import Router, {IRouteConfig} from './Router'
 const {runInterceptors, copyRequest} = Router
 
-const testRoutes = {
+const testRoutes: Record<string, IRouteConfig> = {
   '/': {
     intercept: () => ({params: {root: 'passed'}}),
     beforeEnter: jest.fn(),
@@ -28,7 +28,7 @@ const testRoutes = {
     afterLeave: jest.fn(),
   },
   '/private/mystuff': {
-    intercept: () => ({params: {id: 1}, route: '/private/mystuff/details'}), // test redirect
+    intercept: () => ({route: '/private/mystuff/details', params: {id: 1}}), // test redirect
     beforeEnter: jest.fn(),
     beforeLeave: jest.fn(),
     afterEnter: jest.fn(),
@@ -44,7 +44,8 @@ const testRoutes = {
 }
 
 describe('Router', () => {
-  let router
+  let router = new Router({routes: testRoutes})
+
   beforeEach(() => {
     router = new Router({routes: testRoutes})
   })
@@ -68,7 +69,7 @@ describe('Router', () => {
 
   describe('runInterceptors()', () => {
     it('should work with only root request', () => {
-      const to = {route: '/'}
+      const to = {route: '/', params: {}}
       router.routes = testRoutes
       expect(runInterceptors(router, to)).toEqual({
         params: {root: 'passed'},
@@ -78,7 +79,6 @@ describe('Router', () => {
 
     it('should update the request with intercept hook', () => {
       const to = {route: '/private/mystuff', params: {}}
-      router.routes = testRoutes
       expect(runInterceptors(router, to)).toEqual({
         params: {id: 1, details: 'ok', root: 'passed'},
         route: '/private/mystuff/details',
@@ -95,14 +95,14 @@ describe('Router', () => {
           intercept: jest.fn().mockImplementation(() => ({route: '/a/b/c/d', params: {}})),
         },
         '/a/b/c': {
-          intercept: jest.fn().mockImplementation((router, request) => request),
+          intercept: jest.fn().mockImplementation((request) => request),
         },
         '/a/b/c/d': {
-          intercept: jest.fn().mockImplementation((router, request) => request),
+          intercept: jest.fn().mockImplementation((request) => request),
         },
       }
       router.routes = routes
-      runInterceptors(router, {route: '/a/b/c'})
+      runInterceptors(router, {route: '/a/b/c', params: {}})
       expect(routes['/a/b'].intercept).toHaveBeenCalled()
       expect(routes['/a/b/c'].intercept).toHaveBeenCalled()
       expect(routes['/a/b/c/d'].intercept).toHaveBeenCalled()
@@ -125,42 +125,36 @@ describe('Router', () => {
   describe('goTo()', () => {
     it('should not modify the original request object', () => {
       const params = {id: 1}
-      const request = {route: '/private/mystuff', params}
-      router.goTo(request)
-      expect(request.route).toBe('/private/mystuff')
-      expect(request.params).toBe(params)
-      expect(request.params).toEqual({id: 1})
+      router.goTo('/private/mystuff', params)
+      expect(params).toBe(params)
+      expect(params).toEqual({id: 1})
     })
 
     it('should use runInterceptors to determine the final route and params', () => {
-      const request = {route: '/private/mystuff'}
       const spy = jest.spyOn(Router, 'runInterceptors')
-      router.goTo(request)
+      router.goTo('/private/mystuff')
       expect(spy).toHaveBeenCalled()
     })
 
     it('should update its state with the expected request route and params', () => {
-      const request = {route: '/private/mystuff'}
       // @see the testRoutes config
       const expectedState = {
         route: '/private/mystuff/details',
         params: {id: 1, details: 'ok', root: 'passed'},
       }
-      router.goTo(request)
+      router.goTo('/private/mystuff')
       expect(router.route).toBe(expectedState.route)
       expect(router.params).toEqual(expectedState.params)
     })
 
     it('should add an entry in history', () => {
       // @see the testRoutes config
-      const initialRequest = {route: '/public', params: {}}
       const expectedInitialRequest = {route: '/public', params: {root: 'passed'}}
-      const newRequest = {route: '/public/faq', params: {random: 1}}
       const expectedNewRequest = {route: '/public/faq', params: {random: 1, root: 'passed'}}
-      router.goTo(initialRequest)
+      router.goTo('/public')
       expect(router.story).toHaveLength(1)
       expect(router.story[0]).toEqual(expectedInitialRequest)
-      router.goTo(newRequest)
+      router.goTo('/public/faq', {random: 1})
       expect(router.story).toHaveLength(2)
       expect(router.story[0]).toEqual(expectedNewRequest)
       expect(router.story[1]).toEqual(expectedInitialRequest)
@@ -179,13 +173,12 @@ describe('Router', () => {
 
       describe('- on first request', () => {
         it('should trigger only the beforeEnter and afterEnter of the corresponding route', () => {
-          const request = {route: '/private/mystuff'}
           const expectedUpdatedRequest = {
             // @see the testRoutes config
             route: '/private/mystuff/details',
             params: {id: 1, details: 'ok', root: 'passed'},
           }
-          router.goTo(request)
+          router.goTo('/private/mystuff')
           Object.keys(testRoutes).forEach((key) => {
             const routeConfig = testRoutes[key]
             if (key !== expectedUpdatedRequest.route) {
@@ -194,11 +187,14 @@ describe('Router', () => {
               expect(routeConfig.afterEnter).not.toHaveBeenCalled()
               expect(routeConfig.afterLeave).not.toHaveBeenCalled()
             } else {
-              expect(routeConfig.beforeEnter).toHaveBeenCalledWith(router, expectedUpdatedRequest)
+              expect(routeConfig.beforeEnter).toHaveBeenCalledWith(expectedUpdatedRequest, router)
               expect(routeConfig.beforeLeave).not.toHaveBeenCalled()
               expect(routeConfig.afterEnter).toHaveBeenCalled()
-              const afterEnterArgs = routeConfig.afterEnter.mock.calls[0]
-              expect(afterEnterArgs[0]).toBe(router)
+              if (routeConfig.afterEnter) {
+                // @ts-expect-error TS does not know that jest mocks are provided as hooks
+                const afterEnterArgs = routeConfig.afterEnter.mock.calls[0]
+                expect(afterEnterArgs[1]).toBe(router)
+              }
               expect(routeConfig.afterLeave).not.toHaveBeenCalled()
             }
           })
@@ -207,11 +203,11 @@ describe('Router', () => {
 
       describe('- on subsequent requests', () => {
         it('should trigger the right corresponding hooks', () => {
-          const initialRequest = {route: '/public'}
-          router.goTo(initialRequest)
+          const initialRequest = {route: '/public', params: {}}
+          router.goTo('/public')
           jest.resetAllMocks()
           const newRequest = {route: '/private/mystuff/details', params: {id: 1}}
-          router.goTo(newRequest)
+          router.goTo(newRequest.route, newRequest.params)
           Object.keys(testRoutes).forEach((key) => {
             const routeConfig = testRoutes[key]
             if (key !== initialRequest.route && key !== newRequest.route) {
@@ -238,8 +234,8 @@ describe('Router', () => {
 
   describe('goBack()', () => {
     it('should update the history and go to the previous request', () => {
-      router.goTo({route: '/public/faq'})
-      router.goTo({route: '/private/mystuff'})
+      router.goTo('/public/faq')
+      router.goTo('/private/mystuff')
       expect(router.story).toHaveLength(2)
       router.goBack()
       expect(router.story).toHaveLength(1)
