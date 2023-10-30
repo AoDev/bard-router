@@ -1,6 +1,6 @@
 {
   "name": "bard-router",
-  "version": "2.0.2",
+  "version": "3.0.0-alpha.0",
   "description": "More than just a routing solution, for React/Mobx applications",
   "homepage": "https://github.com/AoDev/bard-router",
   "main": "lib/index.js",

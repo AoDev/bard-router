@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0-alpha.0](https://github.com/AoDev/bard-router/compare/v2.0.2...v3.0.0-alpha.0) (2023-10-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* - Now requires history 5^
+
+- notFound option is removed
+
+- removed vmPlugin (was not useful in practice)
+
+- goTo signature changed, 1rst arg is route path, 2nd is params, 3rd are options
+goTo(route: string, params = {}, goToOptions: IGoToOptions = {})
+
+- intercept & route hooks signature changed, first argument is the request
+(request: IRequest, router: Router) => Partial<IRequest>
+
+### Features
+
+* bard router now works without a need for declaring route configs ([002a2b1](https://github.com/AoDev/bard-router/commit/002a2b11d74d746c241d27536ef01be0bcb0948b))
+
 ### [2.0.2](https://github.com/AoDev/bard-router/compare/v2.0.1...v2.0.2) (2023-02-28)
 
 ### [2.0.1](https://github.com/AoDev/bard-router/compare/v2.0.0...v2.0.1) (2021-07-04)
