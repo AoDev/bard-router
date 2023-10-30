@@ -1,7 +1,7 @@
 ---
 id: faq
-title: "How-to's / FAQ"
-sidebar_label: "How-to's / FAQ"
+title: How-to's / FAQ
+sidebar_label: How-to's / FAQ
 ---
 
 Simple solutions for challenges that one faces usually with routing.

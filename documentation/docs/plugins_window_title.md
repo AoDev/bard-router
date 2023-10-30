@@ -1,7 +1,7 @@
 ---
 id: plugins_window_title
-title: 'Window title plugin'
-sidebar_label: 'Window title plugin'
+title: Window title plugin
+sidebar_label: Window title plugin
 ---
 
 > **Automatically sync the page title with the router state.**

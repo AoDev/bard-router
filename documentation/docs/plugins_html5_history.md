@@ -1,7 +1,7 @@
 ---
 id: plugins_html5_history
-title: "Html5 history plugin"
-sidebar_label: "Html5 history plugin"
+title: Html5 history plugin
+sidebar_label: Html5 history plugin
 ---
 
 > **Synchronize the router with the browser history / URL.**

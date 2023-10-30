@@ -1,15 +1,15 @@
 ---
 id: router_hooks
-title: "Router hooks"
-sidebar_label: "Router hooks"
+title: Router hooks
+sidebar_label: Router hooks
 ---
 
 As opposed to route specific hooks, the router hooks are handlers that you want to call any time there is a navigation event.
 
 ## Hooks available
 
-* `beforeNav` (called before the view / navigation transition)
-* `afterNav` (called after the view / navigation was done)
+- `beforeNav` (called before the view / navigation transition)
+- `afterNav` (called after the view / navigation was done)
 
 These handlers are called with an event object like this:
 
