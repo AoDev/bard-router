@@ -1,7 +1,7 @@
 ---
 id: route_hooks
-title: 'Route specific hooks'
-sidebar_label: 'Route specific hooks'
+title: Route specific hooks
+sidebar_label: Route specific hooks
 ---
 
 **Use route hooks if you need to redirect or run custom logic for a particular navigation request.**
@@ -40,10 +40,9 @@ const routes = {
   '/not-allowed': {},
 
   '/private': {
-    intercept(request, router) {
+    intercept(request) {
       // Example checking auth, you have access to your app store
-      const {appStore} = router.app
-      if (!appStore.user.isAuthenticated()) {
+      if (!rootStore.user.isAuthenticated()) {
         request.route = '/not-allowed'
       }
       return request
@@ -51,7 +50,7 @@ const routes = {
   },
 
   '/private/my-things': {
-    intercept(request, router) {
+    intercept(request) {
       // Example: redirection
       if (request.route === '/private/my-things') {
         request.route = '/private/my-things/details'
@@ -62,7 +61,7 @@ const routes = {
 
   '/private/my-things/details': {
     // Example: setting default params
-    intercept(request, router) {
+    intercept(request) {
       if (typeof request.params.thingID === 'undefined') {
         request.params.thingID = DEFAULT_ID
       }
@@ -70,10 +69,9 @@ const routes = {
     },
 
     // Example: fetching some data before UI is shown
-    beforeEnter(request, router) {
-      const {appStore} = router.app
+    beforeEnter(request) {
       const {params} = request
-      appStore.myThings.fetchDetails(params.thingID)
+      rootStore.myThings.fetchDetails(params.thingID)
       return request
     },
   },

@@ -1,26 +1,10 @@
 {
   "docs": {
-    "About Bard router": [
-      "about_router",
-      "getting_started"
-    ],
-    "Router and routes": [
-      "route_hooks",
-      "router_hooks"
-    ],
-    "React UI Components": [
-      "component_route",
-      "component_link"
-    ],
-    "Plugins": [
-      "plugins_scroll",
-      "plugins_window_title",
-      "plugins_html5_history",
-      "plugins_vm"
-    ],
-    "How to's": [
-      "faq"
-    ]
+    "About Bard router": ["about_router", "getting_started"],
+    "Router and routes": ["route_hooks", "router_hooks"],
+    "React UI Components": ["component_route", "component_link"],
+    "Plugins": ["plugins_scroll", "plugins_window_title", "plugins_html5_history"],
+    "How to's": ["faq"]
   },
   "docs-other": {
     "First Category": ["doc4", "doc5"]

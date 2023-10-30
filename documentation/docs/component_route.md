@@ -1,7 +1,7 @@
 ---
 id: component_route
-title: "<Route/> component"
-sidebar_label: "<Route/>"
+title: '<Route/> component'
+sidebar_label: '<Route/>'
 ---
 
 `Route` are simple UI switches that either render or not the corresponding UI component depending on the router state.
@@ -19,15 +19,12 @@ import MyComponent from './MyComponent'
 
 // MyComponent will render only if router state
 // - matches `/private/my-things`
-// - matches a deeper path `/private/my-things/details`
+// - or, matches a deeper path `/private/my-things/details`
 
-export default function SomeComponentWithRoute () {
+export default function SomeComponentWithRoute() {
   return (
     <div>
-      <Route
-        path="/private/my-things"
-        Component={MyComponent}
-        thingID={1}/>
+      <Route path="/private/my-things" Component={MyComponent} thingID={1} />
     </div>
   )
 }
