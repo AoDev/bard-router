@@ -1,7 +1,7 @@
 ---
 id: route_hooks
-title: "Route specific hooks"
-sidebar_label: "Route specific hooks"
+title: 'Route specific hooks'
+sidebar_label: 'Route specific hooks'
 ---
 
 **Use route hooks if you need to redirect or run custom logic for a particular navigation request.**
@@ -17,13 +17,14 @@ sidebar_label: "Route specific hooks"
 ## `before / after` hooks
 
 Allow to do anything for a particular route, like loading data for the corresponding view. Their function signature is the following:
-`beforeEnter(router, request)`
+`beforeEnter(request, router)`
 
 ## `intercept` hook
 
-Is specifically meant to alter navigation requests.  
+Is specifically meant to alter navigation requests.
+
 > **It must always return a navigation request**.  
-eg: `{route: '/some/route', params: {}}`
+> eg: `{route: '/some/route', params: {}}`
 
 The typical use case is for handling **redirection** or **setting parameters**.
 
@@ -39,7 +40,7 @@ const routes = {
   '/not-allowed': {},
 
   '/private': {
-    intercept (router, request) {
+    intercept(request, router) {
       // Example checking auth, you have access to your app store
       const {appStore} = router.app
       if (!appStore.user.isAuthenticated()) {
@@ -50,7 +51,7 @@ const routes = {
   },
 
   '/private/my-things': {
-    intercept (router, request) {
+    intercept(request, router) {
       // Example: redirection
       if (request.route === '/private/my-things') {
         request.route = '/private/my-things/details'
@@ -61,7 +62,7 @@ const routes = {
 
   '/private/my-things/details': {
     // Example: setting default params
-    intercept (router, request) {
+    intercept(request, router) {
       if (typeof request.params.thingID === 'undefined') {
         request.params.thingID = DEFAULT_ID
       }
@@ -69,13 +70,13 @@ const routes = {
     },
 
     // Example: fetching some data before UI is shown
-    beforeEnter (router, request) {
+    beforeEnter(request, router) {
       const {appStore} = router.app
       const {params} = request
       appStore.myThings.fetchDetails(params.thingID)
       return request
     },
-  }
+  },
 }
 
 export default routes

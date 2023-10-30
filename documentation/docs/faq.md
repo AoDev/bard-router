@@ -14,7 +14,7 @@ Example
 
 ```js
 '/some-route': {
-  intercept (router, request) {
+  intercept (request, router) {
     if (shouldRedirect(router.app.appStore)) {
       request.route = '/somewhere-else'
     }
