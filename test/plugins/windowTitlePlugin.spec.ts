@@ -1,5 +1,5 @@
-import windowTitlePlugin from './windowTitlePlugin'
-import Router, {IRouteConfig} from '../Router'
+import windowTitlePlugin from '../../src/plugins/windowTitlePlugin'
+import Router, {IRouteConfig} from '../../src/Router'
 import RouterMock from '../../test/RouterMock'
 
 const titleSpy = jest.fn()

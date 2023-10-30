@@ -1,6 +1,6 @@
-import scrollPlugin from './scrollPlugin'
-import Router from '../Router'
-import RouterMock from '../../test/RouterMock'
+import scrollPlugin from '../../src/plugins/scrollPlugin'
+import Router from '../../src/Router'
+import RouterMock from '../RouterMock'
 
 const windowMock = {
   scrollTo: jest.fn(),

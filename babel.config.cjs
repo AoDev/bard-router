@@ -1,4 +1,5 @@
 module.exports = {
+  ignore: ['lib'],
   plugins: [
     ['@babel/plugin-transform-class-properties', {loose: true}],
     ['@babel/plugin-transform-object-rest-spread', {loose: true}],

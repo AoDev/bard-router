@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import RouterMock from '../../test/RouterMock'
-import {Link} from './Link' // Named export is the bare component, without observer or inject
+import {Link} from '../../src/react/Link' // Named export is the bare component, without observer or inject
 
 describe('<Link/>', () => {
   let router: RouterMock

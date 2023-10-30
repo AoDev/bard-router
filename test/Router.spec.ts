@@ -1,4 +1,4 @@
-import Router, {IRouteConfig} from './Router'
+import Router, {IRouteConfig} from '../src/Router'
 const {runInterceptors, copyRequest} = Router
 
 const testRoutes: Record<string, IRouteConfig> = {

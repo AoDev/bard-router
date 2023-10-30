@@ -1,4 +1,4 @@
-import {splitPath, diffPaths} from './utils'
+import {splitPath, diffPaths} from '../src/utils'
 
 describe('utils', () => {
   describe('splitPath()', () => {

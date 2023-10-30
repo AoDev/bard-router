@@ -7,3 +7,4 @@ src
 .github*
 babel*
 jest*
+tsconfig.json
