@@ -1,5 +1,5 @@
-import {includes, removeFromArray, splitPath, diffPaths} from './utils'
 import * as mobx from 'mobx'
+import {diffPaths, includes, removeFromArray, splitPath} from './utils'
 
 export type RouteParam = Record<string, string | number>
 
@@ -22,7 +22,7 @@ type RouterHookArgs = {
   goToOptions: IGoToOptions
 }
 
-type routerNavHookHandler = (args: RouterHookArgs) => void
+type RouterNavHookHandler = (args: RouterHookArgs) => void
 
 export interface IRouteConfig {
   beforeEnter?: RouteNavHook
@@ -44,7 +44,7 @@ export interface IBardRouter {
   params: RouteParam
   story: IRequest[]
   options: IRouterOptions
-  eventHandlers: {beforeNav: routerNavHookHandler[]; afterNav: routerNavHookHandler[]}
+  eventHandlers: {beforeNav: RouterNavHookHandler[]; afterNav: RouterNavHookHandler[]}
 }
 
 export default class Router implements IBardRouter {
@@ -53,7 +53,7 @@ export default class Router implements IBardRouter {
   params: Record<string, string | number> = {}
   story: IRequest[] = []
   options: IRouterOptions
-  eventHandlers: {beforeNav: routerNavHookHandler[]; afterNav: routerNavHookHandler[]} = {
+  eventHandlers: {beforeNav: RouterNavHookHandler[]; afterNav: RouterNavHookHandler[]} = {
     beforeNav: [],
     afterNav: [],
   }
@@ -68,10 +68,7 @@ export default class Router implements IBardRouter {
    *   It is expected that params are only one level deep.
    */
   static copyRequest(request: IRequest) {
-    return {
-      route: request.route,
-      params: request.params ? {...request.params} : {},
-    }
+    return {route: request.route, params: request.params ? {...request.params} : {}}
   }
 
   /**
@@ -144,7 +141,9 @@ export default class Router implements IBardRouter {
     }
 
     if (this.eventHandlers.beforeNav.length > 0) {
-      this.eventHandlers.beforeNav.forEach((handler) => handler(routerHookArgs))
+      this.eventHandlers.beforeNav.forEach((handler) => {
+        handler(routerHookArgs)
+      })
     }
 
     routeConfig?.beforeEnter?.(updatedRequest, this)
@@ -165,7 +164,9 @@ export default class Router implements IBardRouter {
 
     this.story = Router.updateStory(this.story, updatedRequest, goToOptions)
 
-    this.eventHandlers.afterNav.forEach((handler) => handler(routerHookArgs))
+    this.eventHandlers.afterNav.forEach((handler) => {
+      handler(routerHookArgs)
+    })
 
     return updatedRequest
   }
@@ -184,7 +185,7 @@ export default class Router implements IBardRouter {
    * Attach router hook.
    * This hook runs for every route change
    */
-  on(eventName: 'beforeNav' | 'afterNav', handler: routerNavHookHandler) {
+  on(eventName: 'beforeNav' | 'afterNav', handler: RouterNavHookHandler) {
     this.eventHandlers[eventName].push(handler)
   }
 
@@ -193,7 +194,7 @@ export default class Router implements IBardRouter {
    * @param {['beforeNav', 'afterNav']} eventName
    * @param {Function} handler - Anonymous functions can not be removed
    */
-  off(eventName: 'beforeNav' | 'afterNav', handler: routerNavHookHandler) {
+  off(eventName: 'beforeNav' | 'afterNav', handler: RouterNavHookHandler) {
     if (!includes(Router.routerEvents, eventName)) {
       throw new Error(`invalid "${eventName}" event`)
     }

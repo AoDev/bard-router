@@ -22,6 +22,15 @@
 npm install bard-router -DE
 ```
 
+## Build (Rslib)
+
+Library ships as **dual CJS + ESM** plus TypeScript declarations (see `package.json` `main` / `module` / `types` / `exports`).
+
+- **Build:** `npm run build` → `lib/` (CJS + `.d.ts`, same paths as before for root + deep imports), `esm/` (ESM `.mjs`)
+- **Inspect config:** `npm run build:inspect`
+
+Development guide: [DEVELOPMENT.md](DEVELOPMENT.md).
+
 ## Check the docs :)
 
 [Full documentation site](https://bard-mobx-router.netlify.com)

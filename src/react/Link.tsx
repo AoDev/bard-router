@@ -1,8 +1,9 @@
-import React, {useCallback} from 'react'
-import Router, {RouteParam} from '../Router'
-import injectRouter from './injectRouter'
+import {inject, observer} from 'mobx-react'
+import {type FC, type LinkHTMLAttributes, type MouseEvent, useCallback} from 'react'
+import type Router from '../Router'
+import type {RouteParam} from '../Router'
 
-interface ILinkProps extends React.LinkHTMLAttributes<HTMLAnchorElement> {
+export interface ILinkProps extends LinkHTMLAttributes<HTMLAnchorElement> {
   active?: boolean
   autoActive?: boolean
   className?: string
@@ -29,14 +30,14 @@ export function Link({
   ...otherProps
 }: ILinkProps) {
   const handleOnClick = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    (event: MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>) => {
       event.preventDefault()
       router.goTo(to, params)
       if (onClick) {
         onClick(event)
       }
     },
-    [to, params, onClick]
+    [to, params, onClick, router.goTo]
   )
 
   let cssClasses = className
@@ -55,6 +56,6 @@ export function Link({
 /**
  * Link component with the router already available
  */
-const InjectedLink = injectRouter(Link) as unknown as React.FC<Omit<ILinkProps, 'router'>>
+const InjectedLink = inject((stores: {router: Router}) => ({router: stores.router}))(observer(Link))
 
-export default InjectedLink
+export default InjectedLink as unknown as FC<Omit<ILinkProps, 'router'>>

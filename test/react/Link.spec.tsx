@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import RouterMock from '../../test/RouterMock'
 import {Link} from '../../src/react/Link' // Named export is the bare component, without observer or inject
+import RouterMock from '../../test/RouterMock'
 
 describe('<Link/>', () => {
   let router: RouterMock
@@ -35,7 +35,9 @@ describe('<Link/>', () => {
       render(<Link to="/some/route" className="link" active={false} router={router} />)
 
       const links = screen.getAllByRole('link')
-      links.forEach((link) => expect(link.getAttribute('class')).toBe('link'))
+      links.forEach((link) => {
+        expect(link.getAttribute('class')).toBe('link')
+      })
     })
   })
 

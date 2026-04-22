@@ -1,4 +1,5 @@
-import Router, {IRouteConfig} from '../src/Router'
+import Router, {type IRouteConfig} from '../src/Router'
+
 const {runInterceptors, copyRequest} = Router
 
 const testRoutes: Record<string, IRouteConfig> = {
@@ -71,10 +72,7 @@ describe('Router', () => {
     it('should work with only root request', () => {
       const to = {route: '/', params: {}}
       router.routes = testRoutes
-      expect(runInterceptors(router, to)).toEqual({
-        params: {root: 'passed'},
-        route: '/',
-      })
+      expect(runInterceptors(router, to)).toEqual({params: {root: 'passed'}, route: '/'})
     })
 
     it('should update the request with intercept hook', () => {
@@ -91,15 +89,9 @@ describe('Router', () => {
       const routes = {
         '/': {},
         '/a': {},
-        '/a/b': {
-          intercept: jest.fn().mockImplementation(() => ({route: '/a/b/c/d', params: {}})),
-        },
-        '/a/b/c': {
-          intercept: jest.fn().mockImplementation((request) => request),
-        },
-        '/a/b/c/d': {
-          intercept: jest.fn().mockImplementation((request) => request),
-        },
+        '/a/b': {intercept: jest.fn().mockImplementation(() => ({route: '/a/b/c/d', params: {}}))},
+        '/a/b/c': {intercept: jest.fn().mockImplementation((request) => request)},
+        '/a/b/c/d': {intercept: jest.fn().mockImplementation((request) => request)},
       }
       router.routes = routes
       runInterceptors(router, {route: '/a/b/c', params: {}})
