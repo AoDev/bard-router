@@ -17,7 +17,7 @@
   },
   "scripts": {
     "lint": "biome check .",
-    "lint:error": "biome lint . --diagnostic-level=error",
+    "lint:error": "biome check . --diagnostic-level=error",
     "lint:fix": "biome lint --write .",
     "build": "del-cli lib esm && rslib build",
     "build:inspect": "rslib inspect --verbose",

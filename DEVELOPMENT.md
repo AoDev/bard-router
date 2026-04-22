@@ -12,7 +12,7 @@
 - `npm run build` - clean + build CJS/ESM/types via Rslib
 - `npm run build:inspect` - inspect resolved Rslib/Rspack config
 - `npm run lint` - Biome check (lint + format + imports)
-- `npm run lint:error` - Biome lint, errors only
+- `npm run lint:error` - same checks as `lint`, diagnostics at error level only (quieter logs; CI uses this)
 - `npm run lint:fix` - Biome lint with auto-fix
 - `npm test` - Jest (`ts-jest`)
 
