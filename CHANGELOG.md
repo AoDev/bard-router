@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0-rc.0](https://github.com/AoDev/bard-router/compare/v3.0.0...v4.0.0-rc.0) (2026-04-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* **react:** TypeScript consumers may see new errors where Route/Link props were previously inferred loosely. Route now couples `Component` to `ComponentProps` and expects explicit `path` and `Component`. Published `.d.ts` come from `tsconfig.build.json` only (src), which can surface stricter types than before. `injectRouter` was removed; inline `inject`/`observer` patterns from the library source instead.
+
+### Features
+
+* **react:** stricter Route/Link types and Rslib publish pipeline ([8d2ad24](https://github.com/AoDev/bard-router/commit/8d2ad24989ce3d681a807fa9165d295d6a561896))
+
 ## [3.0.0](https://github.com/AoDev/bard-router/compare/v3.0.0-alpha.0...v3.0.0) (2023-10-30)
 
 ## [3.0.0-alpha.0](https://github.com/AoDev/bard-router/compare/v2.0.2...v3.0.0-alpha.0) (2023-10-30)
