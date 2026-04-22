@@ -1,5 +1,6 @@
-import {Location, Path, createBrowserHistory} from 'history'
-import Router, {IRequest, RouteParam} from '../Router'
+import {createBrowserHistory, type Location, type Path} from 'history'
+import type Router from '../Router'
+import type {IRequest, RouteParam} from '../Router'
 
 /**
  * Check if two objects have same properties, one level deep
@@ -26,15 +27,15 @@ function requestFromLocation(location: Location): IRequest {
  * Create a valid history location from a routing request
  */
 function locationFromRequest(request: IRequest) {
-  const path: Partial<Path> = {
-    pathname: request.route,
-  }
+  const path: Partial<Path> = {pathname: request.route}
   const {params} = request
   const paramsKeys = Object.keys(params)
   if (paramsKeys.length > 0) {
     const searchParams = new URLSearchParams()
-    paramsKeys.forEach((key) => searchParams.append(key, String(params[key])))
-    path.search = '?' + searchParams.toString()
+    paramsKeys.forEach((key) => {
+      searchParams.append(key, String(params[key]))
+    })
+    path.search = `?${searchParams.toString()}`
   }
 
   return path
@@ -88,6 +89,4 @@ export function register(router: Router) {
   return history
 }
 
-export default {
-  register,
-}
+export default {register}

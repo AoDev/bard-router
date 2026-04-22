@@ -4,12 +4,24 @@
   "description": "More than just a routing solution, for React/Mobx applications",
   "homepage": "https://github.com/AoDev/bard-router",
   "main": "lib/index.js",
+  "module": "esm/index.mjs",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./esm/index.mjs",
+      "require": "./lib/index.js"
+    },
+    "./lib/*": "./lib/*",
+    "./esm/*": "./esm/*"
+  },
   "scripts": {
-    "build:js": "del-cli lib && babel src --out-dir lib --extensions '.ts,.tsx'",
-    "build:types": "tsc --emitDeclarationOnly --listEmittedFiles",
-    "build": "npm run build:js && npm run build:types",
-    "lint": "eslint src --quiet",
-    "prepare": "NODE_ENV=production && npm run build",
+    "lint": "biome check .",
+    "lint:error": "biome lint . --diagnostic-level=error",
+    "lint:fix": "biome lint --write .",
+    "build": "del-cli lib esm && rslib build",
+    "build:inspect": "rslib inspect --verbose",
+    "prepare": "npm run build",
     "tag-release": "npm test && standard-version",
     "test-unit": "jest",
     "test": "jest"
@@ -23,41 +35,37 @@
     "type": "git",
     "url": "git@github.com:AoDev/bard-router.git"
   },
-  "author": "Kevin Purnelle <kevin.purnelle@gmail.com> (http://kevinpurnelle.com/)",
+  "author": "AoDev",
   "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^20.19.0 || >=22.12.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=10.0.0",
+      "onFail": "warn"
+    }
+  },
   "dependencies": {
     "history": "^5.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.23.0",
-    "@babel/compat-data": "7.23.2",
-    "@babel/core": "7.23.2",
-    "@babel/eslint-parser": "7.22.15",
-    "@babel/plugin-transform-runtime": "7.23.2",
-    "@babel/preset-env": "7.23.2",
-    "@babel/preset-react": "7.22.15",
-    "@babel/preset-typescript": "7.23.2",
-    "@babel/runtime": "7.23.2",
+    "@biomejs/biome": "2.4.5",
+    "@rsbuild/plugin-react": "2.0.0",
+    "@rslib/core": "0.21.2",
     "@testing-library/jest-dom": "6.1.4",
     "@testing-library/react": "14.0.0",
     "@testing-library/user-event": "14.5.1",
     "@types/history": "5.0.0",
     "@types/jest": "29.5.6",
     "@types/react": "18.2.33",
-    "@typescript-eslint/eslint-plugin": "6.9.0",
-    "@typescript-eslint/parser": "6.9.0",
-    "babel-jest": "29.7.0",
-    "babel-plugin-add-module-exports": "1.0.4",
-    "babel-plugin-module-resolver": "5.0.0",
     "del-cli": "5.1.0",
-    "eslint": "8.52.0",
-    "eslint-config-prettier": "9.0.0",
-    "eslint-config-standard": "17.1.0",
-    "eslint-plugin-import": "2.29.0",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-prettier": "5.0.1",
-    "eslint-plugin-promise": "6.1.1",
-    "eslint-plugin-react": "7.33.2",
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
     "mobx": "6.10.2",

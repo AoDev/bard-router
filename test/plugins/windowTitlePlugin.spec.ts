@@ -1,16 +1,12 @@
 import windowTitlePlugin from '../../src/plugins/windowTitlePlugin'
-import Router, {IRouteConfig} from '../../src/Router'
+import Router, {type IRouteConfig} from '../../src/Router'
 import RouterMock from '../../test/RouterMock'
 
 const titleSpy = jest.fn()
 
 const routes: Record<string, IRouteConfig> = {
-  '/': {
-    windowTitlePlugin: 'Root',
-  },
-  '/some-page': {
-    windowTitlePlugin: 'Some page',
-  },
+  '/': {windowTitlePlugin: 'Root'},
+  '/some-page': {windowTitlePlugin: 'Some page'},
   '/some-other-page': {
     windowTitlePlugin: (router: Router) => {
       titleSpy(router)

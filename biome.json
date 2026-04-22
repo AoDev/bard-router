@@ -1,0 +1,135 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.5/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on",
+        "useSortedKeys": {
+          "options": {
+            "sortOrder": "natural"
+          }
+        }
+      }
+    }
+  },
+  "files": {
+    "includes": [
+      "./**/*.js",
+      "./**/*.ts",
+      "./**/*.tsx",
+      "./**/*.jsx",
+      "!!node_modules",
+      "!!.next",
+      "!!out",
+      "!!build",
+      "!!.claude/worktrees",
+      "!!documentation"
+    ]
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "always",
+      "bracketSpacing": false,
+      "jsxQuoteStyle": "double",
+      "quoteStyle": "single",
+      "semicolons": "asNeeded",
+      "trailingCommas": "es5",
+      "expand": "never"
+    }
+  },
+  "css": {
+    "parser": {
+      "cssModules": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "useNumberNamespace": "off",
+        "noDefaultExport": "info",
+        "useBlockStatements": { "level": "error", "fix": "safe" },
+        "useTemplate": { "level": "warn", "fix": "safe" },
+        "useForOf": "error",
+        "useNamingConvention": {
+          "level": "error",
+          "options": {
+            "strictCase": false,
+            "conventions": [
+              {
+                "selector": { "kind": "const", "scope": "global" },
+                "match": ".*"
+              },
+              {
+                "selector": { "kind": "variable" },
+                "match": "([ijkxyz]|.{2,})"
+              },
+              {
+                "selector": { "kind": "functionParameter" },
+                "match": "([abxy]|.{2,})"
+              },
+              {
+                "selector": { "kind": "typeParameter" },
+                "match": "([A-Z]|.{2,})",
+                "formats": ["camelCase", "PascalCase", "CONSTANT_CASE", "snake_case"]
+              },
+              {
+                "selector": { "kind": "objectLiteralProperty" },
+                "match": "([xyz]|.{2,})",
+                "formats": ["camelCase", "PascalCase", "CONSTANT_CASE", "snake_case"]
+              },
+              {
+                "selector": { "kind": "objectLiteralMethod" },
+                "match": "([A-Z]{2,}|.{2,})",
+                "formats": ["camelCase", "PascalCase", "CONSTANT_CASE", "snake_case"]
+              },
+              {
+                "selector": { "kind": "enumMember" },
+                "match": ".{2,}",
+                "formats": ["camelCase", "PascalCase", "CONSTANT_CASE", "snake_case"]
+              },
+              {
+                "selector": { "kind": "classProperty" },
+                "match": ".{2,}"
+              }
+            ]
+          }
+        }
+      },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "off",
+        "noStaticElementInteractions": "warn",
+        "noLabelWithoutControl": {
+          "level": "error",
+          "options": {
+            "inputComponents": ["Input", "InputX"]
+          }
+        }
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": { "level": "error", "fix": "safe" }
+      },
+      "complexity": {
+        "noVoid": "error"
+      },
+      "nursery": {
+        "noJsxPropsBind": "error"
+      }
+    }
+  }
+}

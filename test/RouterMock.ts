@@ -1,4 +1,4 @@
-import {IBardRouter} from '../src/Router'
+import type {IBardRouter} from '../src/Router'
 
 export default class RouterMock implements IBardRouter {
   currentRouteConfig = {}

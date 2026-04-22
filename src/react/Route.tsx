@@ -1,23 +1,38 @@
-import React from 'react'
-import Router from '../Router'
-import injectRouter from './injectRouter'
+import {inject, observer} from 'mobx-react'
+import type {ComponentProps, ComponentType, JSX} from 'react'
+import {createElement} from 'react'
+import type Router from '../Router'
 
-export type RouteProps<T extends Record<string, unknown>> = {
-  router?: Router
+export interface RouteOwnProps<C extends ComponentType<any>> {
+  router: Router
   path: string
-  Component: React.ComponentType<T>
-} & T
+  // biome-ignore lint/style/useNamingConvention: API intentionally uses React's conventional Component prop.
+  Component: C
+}
 
-export function Route<T extends Record<string, unknown>>(props: RouteProps<T>) {
+export type RouteProps<C extends ComponentType<any>> = RouteOwnProps<C> & ComponentProps<C>
+
+export type InjectedRouteProps<C extends ComponentType<any>> = Omit<RouteOwnProps<C>, 'router'> &
+  ComponentProps<C>
+
+type RouteComponent = <C extends ComponentType<any>>(props: RouteProps<C>) => JSX.Element | null
+type InjectedRouteComponent = <C extends ComponentType<any>>(
+  props: InjectedRouteProps<C>
+) => JSX.Element | null
+
+export const Route: RouteComponent = (props) => {
   const {router, path, Component, ...otherProps} = props
   if (!router?.route.startsWith(path)) {
     return null
   }
-  // @ts-expect-error TODO Dont know how to solve this type issue
-  return <Component {...otherProps} />
+  return createElement(Component, otherProps as ComponentProps<typeof Component>)
 }
 
 /**
  * Route component with the router already available
  */
-export default injectRouter(Route)
+const InjectedRoute = inject((stores: {router: Router}) => ({router: stores.router}))(
+  observer(Route)
+)
+
+export default InjectedRoute as unknown as InjectedRouteComponent

@@ -20,7 +20,7 @@ export function removeFromArray<V>(array: any[], value: V) {
  * @see splitPath
  */
 export function splitPathReducer(acc: any[], step: string, index: number) {
-  acc.push(index === 0 ? '' : acc[index - 1] + '/' + step)
+  acc.push(index === 0 ? '' : `${acc[index - 1]}/${step}`)
   return acc
 }
 

@@ -2,14 +2,9 @@ import scrollPlugin from '../../src/plugins/scrollPlugin'
 import Router from '../../src/Router'
 import RouterMock from '../RouterMock'
 
-const windowMock = {
-  scrollTo: jest.fn(),
-}
+const windowMock = {scrollTo: jest.fn()}
 
-const testRoutes = {
-  '/': {},
-  '/page': {},
-}
+const testRoutes = {'/': {}, '/page': {}}
 
 describe('scrollPlugin', () => {
   describe('register', () => {
