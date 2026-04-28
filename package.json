@@ -1,6 +1,6 @@
 {
   "name": "bard-router",
-  "version": "4.0.0-rc.0",
+  "version": "4.0.0-rc.1",
   "description": "Type-safe React + MobX router with simple navigation APIs, hooks, and extensible plugins.",
   "homepage": "https://github.com/AoDev/bard-router",
   "main": "lib/index.js",

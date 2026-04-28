@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0-rc.1](https://github.com/AoDev/bard-router/compare/v4.0.0-rc.0...v4.0.0-rc.1) (2026-04-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* **router:** default exports and deep subpath imports (e.g. bard-router/lib/* and bard-router/esm/*) are no longer part of the public API; import from bard-router using named exports.
+
+* docs(readme): refresh positioning and usage guidance
+
+Update README copy to reflect the current typed API, simplify installation instructions, and add a root-level named import usage example. Align build notes with the current package export surface by removing outdated deep-import wording.
+
+* docs: update build + deploy
+
+### Bug Fixes
+
+* **router:** make off() unsubscribe handlers correctly + refactor + docs ([#19](https://github.com/AoDev/bard-router/issues/19)) ([5e7d77b](https://github.com/AoDev/bard-router/commit/5e7d77bd2cfdb2f3d5cdd2afd1c92553585b264a))
+
 ## [4.0.0-rc.0](https://github.com/AoDev/bard-router/compare/v3.0.0...v4.0.0-rc.0) (2026-04-22)
 
 ### ⚠ BREAKING CHANGES
