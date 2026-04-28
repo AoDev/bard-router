@@ -1,0 +1,1 @@
+import{_ as s,o as t,c as e,ag as i}from"./chunks/framework.B4Sg2J31.js";const u=JSON.parse('{"title":"Bard mobx router","description":"","frontmatter":{},"headers":[],"relativePath":"index.md","filePath":"index.md"}'),r={name:"index.md"};function o(n,a,l,p,d,h){return t(),e("div",null,[...a[0]||(a[0]=[i("",6)])])}const k=s(r,[["render",o]]);export{u as __pageData,k as default};
