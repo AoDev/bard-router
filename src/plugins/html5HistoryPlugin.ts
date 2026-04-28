@@ -1,6 +1,5 @@
 import {createBrowserHistory, type Location, type Path} from 'history'
-import type Router from '../Router'
-import type {IRequest, RouteParam} from '../Router'
+import type {IRequest, RouteParam, Router} from '../Router'
 
 /**
  * Check if two objects have same properties, one level deep
@@ -89,4 +88,4 @@ export function register(router: Router) {
   return history
 }
 
-export default {register}
+export const html5HistoryPlugin = {register}

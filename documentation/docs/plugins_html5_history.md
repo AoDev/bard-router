@@ -17,8 +17,7 @@ You simply need to use the `html5HistoryPlugin`. Under the hood, it is using [Re
 Here is an example using ES6 and the MobxRouter.
 
 ```js
-import {Router} from 'bard-router'
-import html5HistoryPlugin from 'bard-router/lib/plugins/html5HistoryPlugin'
+import {html5HistoryPlugin, Router} from 'bard-router'
 
 const router = new Router(/*...*/)
 html5HistoryPlugin.register(router)

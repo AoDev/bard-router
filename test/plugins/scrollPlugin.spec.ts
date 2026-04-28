@@ -1,7 +1,7 @@
 import {vi} from 'vitest'
-import scrollPlugin from '../../src/plugins/scrollPlugin'
-import Router from '../../src/Router'
-import RouterMock from '../RouterMock'
+import {scrollPlugin} from '../../src/plugins/scrollPlugin'
+import {Router} from '../../src/Router'
+import {RouterMock} from '../RouterMock'
 
 const windowMock = {scrollTo: vi.fn()}
 

@@ -1,7 +1,6 @@
 import {inject, observer} from 'mobx-react'
 import {type FC, type LinkHTMLAttributes, type MouseEvent, useCallback} from 'react'
-import type Router from '../Router'
-import type {RouteParam} from '../Router'
+import type {RouteParam, Router} from '../Router'
 
 export interface ILinkProps extends LinkHTMLAttributes<HTMLAnchorElement> {
   active?: boolean
@@ -19,7 +18,7 @@ function isLinkActive(router: Router, to: string, params: RouteParam) {
   return router.route.startsWith(to) && router.paramMatch(router.params, params)
 }
 
-export function Link({
+export function PlainLink({
   to,
   active,
   params = {},
@@ -56,6 +55,8 @@ export function Link({
 /**
  * Link component with the router already available
  */
-const InjectedLink = inject((stores: {router: Router}) => ({router: stores.router}))(observer(Link))
+const InjectedLink = inject((stores: {router: Router}) => ({router: stores.router}))(
+  observer(PlainLink)
+)
 
-export default InjectedLink as unknown as FC<Omit<ILinkProps, 'router'>>
+export const Link = InjectedLink as unknown as FC<Omit<ILinkProps, 'router'>>

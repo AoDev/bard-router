@@ -54,7 +54,7 @@ export interface IBardRouter {
   eventHandlers: RouterEventHandlers
 }
 
-export default class Router implements IBardRouter {
+export class Router implements IBardRouter {
   routes: Record<string, IRouteConfig>
   route = '/'
   params: Record<string, string | number> = {}

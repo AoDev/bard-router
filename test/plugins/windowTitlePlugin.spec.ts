@@ -1,7 +1,7 @@
 import {vi} from 'vitest'
-import windowTitlePlugin from '../../src/plugins/windowTitlePlugin'
-import Router, {type IRouteConfig} from '../../src/Router'
-import RouterMock from '../../test/RouterMock'
+import {windowTitlePlugin} from '../../src/plugins/windowTitlePlugin'
+import {type IRouteConfig, Router} from '../../src/Router'
+import {RouterMock} from '../../test/RouterMock'
 
 const titleSpy = vi.fn()
 

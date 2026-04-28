@@ -1,5 +1,5 @@
 import {vi} from 'vitest'
-import Router, {type IRouteConfig} from '../src/Router'
+import {type IRouteConfig, Router} from '../src/Router'
 
 const {runInterceptors, copyRequest} = Router
 
