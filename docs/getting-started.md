@@ -45,7 +45,7 @@ const router = new Router({
 const render = (Component) => {
   reactDom.render(
     <Provider router={router} rootStore={rootStore}>
-      <Component />
+      <App />
     </Provider>,
     document.getElementById('root')
   )
@@ -63,7 +63,7 @@ The router expects a map of your routes with optional hooks.
 `routes.js`
 
 ```js
-const routes = {
+export const routes = {
   '/': {}, // route config
   '/private': {
     // eg: prevent access to sections that need authentication
@@ -92,7 +92,6 @@ const routes = {
   },
   // ...
 }
-export default routes
 ```
 
 ### About the route path
@@ -100,3 +99,25 @@ export default routes
 The route "path" is reserved to display the right view, in other words: **navigate the app shell**. Each key, like `/private/my-things` will have one corresponding view. Any dynamic content will use the request params to display the corresponding data.
 
 In summary, with bard-router, there is no route like: `/private/thing/:thingID/edit` but rather `/private/thing/edit?thingID=x`. This makes things simpler.
+
+## Use Route and Link
+
+Use `<Route/>` as a UI switch bound to the current router path, and `<Link/>` to trigger navigation requests from UI.
+
+```tsx
+import {Link, Route} from 'bard-router'
+import {MyThingsPage} from './MyThingsPage'
+
+export function AppShell() {
+  return (
+    <div>
+      <Link to="/private/my-things">View your things</Link>
+
+      <Route path="/private/my-things" Component={MyThingsPage} />
+    </div>
+  )
+}
+```
+
+- Route details: [Route component](/component-route)
+- Link details: [Link component](/component-link)

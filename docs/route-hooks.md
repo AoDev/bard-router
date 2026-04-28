@@ -30,7 +30,7 @@ Shows fetching data, setting default params, accessing the app store and redirec
 
 ```js
 // routes.js
-const routes = {
+export const routes = {
   '/': {},
   '/public': {},
   '/not-allowed': {},
@@ -72,6 +72,4 @@ const routes = {
     },
   },
 }
-
-export default routes
 ```

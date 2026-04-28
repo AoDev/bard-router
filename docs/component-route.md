@@ -17,7 +17,7 @@ import MyComponent from './MyComponent'
 // - matches `/private/my-things`
 // - or, matches a deeper path `/private/my-things/details`
 
-export default function SomeComponentWithRoute() {
+export function SomeComponentWithRoute() {
   return (
     <div>
       <Route path="/private/my-things" Component={MyComponent} thingID={1} />

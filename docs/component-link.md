@@ -14,7 +14,7 @@ You can manually control this behaviour by setting `active={true|false}`.
 import React from 'react'
 import {Link} from 'bard-router'
 
-export default function SomeTextWithLink() {
+export function SomeTextWithLink() {
   return (
     <div>
       <h3>Do something</h3>
