@@ -1,8 +1,9 @@
+import {vi} from 'vitest'
 import scrollPlugin from '../../src/plugins/scrollPlugin'
 import Router from '../../src/Router'
 import RouterMock from '../RouterMock'
 
-const windowMock = {scrollTo: jest.fn()}
+const windowMock = {scrollTo: vi.fn()}
 
 const testRoutes = {'/': {}, '/page': {}}
 

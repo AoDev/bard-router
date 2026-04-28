@@ -1,16 +1,17 @@
+import {vi} from 'vitest'
 import type {IBardRouter} from '../src/Router'
 
 export default class RouterMock implements IBardRouter {
   currentRouteConfig = {}
   eventHandlers = {beforeNav: [] as any[], afterNav: [] as any[]}
-  goBack = jest.fn()
-  goTo = jest.fn()
-  off = jest.fn()
-  on = jest.fn()
+  goBack = vi.fn()
+  goTo = vi.fn()
+  off = vi.fn()
+  on = vi.fn()
   onAfterNav: any[] = []
   onBeforeNav: any[] = []
   options = {}
-  paramMatch = jest.fn()
+  paramMatch = vi.fn()
   params = {}
   route = '/'
   routes = {}

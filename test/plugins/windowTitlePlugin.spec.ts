@@ -1,8 +1,9 @@
+import {vi} from 'vitest'
 import windowTitlePlugin from '../../src/plugins/windowTitlePlugin'
 import Router, {type IRouteConfig} from '../../src/Router'
 import RouterMock from '../../test/RouterMock'
 
-const titleSpy = jest.fn()
+const titleSpy = vi.fn()
 
 const routes: Record<string, IRouteConfig> = {
   '/': {windowTitlePlugin: 'Root'},

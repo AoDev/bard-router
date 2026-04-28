@@ -1,3 +1,4 @@
+import {vi} from 'vitest'
 import Router, {type IRouteConfig} from '../src/Router'
 
 const {runInterceptors, copyRequest} = Router
@@ -5,42 +6,37 @@ const {runInterceptors, copyRequest} = Router
 const testRoutes: Record<string, IRouteConfig> = {
   '/': {
     intercept: () => ({params: {root: 'passed'}}),
-    beforeEnter: jest.fn(),
-    beforeLeave: jest.fn(),
-    afterEnter: jest.fn(),
-    afterLeave: jest.fn(),
+    beforeEnter: vi.fn(),
+    beforeLeave: vi.fn(),
+    afterEnter: vi.fn(),
+    afterLeave: vi.fn(),
   },
-  '/public': {
-    beforeEnter: jest.fn(),
-    beforeLeave: jest.fn(),
-    afterEnter: jest.fn(),
-    afterLeave: jest.fn(),
-  },
+  '/public': {beforeEnter: vi.fn(), beforeLeave: vi.fn(), afterEnter: vi.fn(), afterLeave: vi.fn()},
   '/public/faq': {
-    beforeEnter: jest.fn(),
-    beforeLeave: jest.fn(),
-    afterEnter: jest.fn(),
-    afterLeave: jest.fn(),
+    beforeEnter: vi.fn(),
+    beforeLeave: vi.fn(),
+    afterEnter: vi.fn(),
+    afterLeave: vi.fn(),
   },
   '/private': {
-    beforeEnter: jest.fn(),
-    beforeLeave: jest.fn(),
-    afterEnter: jest.fn(),
-    afterLeave: jest.fn(),
+    beforeEnter: vi.fn(),
+    beforeLeave: vi.fn(),
+    afterEnter: vi.fn(),
+    afterLeave: vi.fn(),
   },
   '/private/mystuff': {
     intercept: () => ({route: '/private/mystuff/details', params: {id: 1}}), // test redirect
-    beforeEnter: jest.fn(),
-    beforeLeave: jest.fn(),
-    afterEnter: jest.fn(),
-    afterLeave: jest.fn(),
+    beforeEnter: vi.fn(),
+    beforeLeave: vi.fn(),
+    afterEnter: vi.fn(),
+    afterLeave: vi.fn(),
   },
   '/private/mystuff/details': {
     intercept: () => ({params: {details: 'ok'}}),
-    beforeEnter: jest.fn(),
-    beforeLeave: jest.fn(),
-    afterEnter: jest.fn(),
-    afterLeave: jest.fn(),
+    beforeEnter: vi.fn(),
+    beforeLeave: vi.fn(),
+    afterEnter: vi.fn(),
+    afterLeave: vi.fn(),
   },
 }
 
@@ -89,9 +85,9 @@ describe('Router', () => {
       const routes = {
         '/': {},
         '/a': {},
-        '/a/b': {intercept: jest.fn().mockImplementation(() => ({route: '/a/b/c/d', params: {}}))},
-        '/a/b/c': {intercept: jest.fn().mockImplementation((request) => request)},
-        '/a/b/c/d': {intercept: jest.fn().mockImplementation((request) => request)},
+        '/a/b': {intercept: vi.fn().mockImplementation(() => ({route: '/a/b/c/d', params: {}}))},
+        '/a/b/c': {intercept: vi.fn().mockImplementation((request) => request)},
+        '/a/b/c/d': {intercept: vi.fn().mockImplementation((request) => request)},
       }
       router.routes = routes
       runInterceptors(router, {route: '/a/b/c', params: {}})
@@ -123,7 +119,7 @@ describe('Router', () => {
     })
 
     it('should use runInterceptors to determine the final route and params', () => {
-      const spy = jest.spyOn(Router, 'runInterceptors')
+      const spy = vi.spyOn(Router, 'runInterceptors')
       router.goTo('/private/mystuff')
       expect(spy).toHaveBeenCalled()
     })
@@ -183,7 +179,7 @@ describe('Router', () => {
               expect(routeConfig.beforeLeave).not.toHaveBeenCalled()
               expect(routeConfig.afterEnter).toHaveBeenCalled()
               if (routeConfig.afterEnter) {
-                // @ts-expect-error TS does not know that jest mocks are provided as hooks
+                // @ts-expect-error TS does not know that vi mocks are provided as hooks
                 const afterEnterArgs = routeConfig.afterEnter.mock.calls[0]
                 expect(afterEnterArgs[1]).toBe(router)
               }
@@ -197,7 +193,7 @@ describe('Router', () => {
         it('should trigger the right corresponding hooks', () => {
           const initialRequest = {route: '/public', params: {}}
           router.goTo('/public')
-          jest.resetAllMocks()
+          vi.resetAllMocks()
           const newRequest = {route: '/private/mystuff/details', params: {id: 1}}
           router.goTo(newRequest.route, newRequest.params)
           Object.keys(testRoutes).forEach((key) => {

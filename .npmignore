@@ -5,5 +5,5 @@ src
 **/test
 .prettier*
 .github*
-jest*
+vitest*
 tsconfig.json
