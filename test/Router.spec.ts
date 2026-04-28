@@ -95,8 +95,6 @@ describe('Router', () => {
       expect(routes['/a/b/c'].intercept).toHaveBeenCalled()
       expect(routes['/a/b/c/d'].intercept).toHaveBeenCalled()
     })
-
-    test.todo('must pass a COPY of the request to the user interceptor')
   })
 
   describe('copyRequest()', () => {
@@ -230,6 +228,26 @@ describe('Router', () => {
       expect(router.route).toEqual('/public/faq')
       expect(router.params).toEqual({root: 'passed'})
       expect(router.story[0]).toEqual({route: '/public/faq', params: {root: 'passed'}})
+    })
+  })
+
+  describe('on()/off()', () => {
+    it('should remove handler for event when off() is called', () => {
+      const beforeNavHandler = vi.fn()
+
+      router.on('beforeNav', beforeNavHandler)
+      router.off('beforeNav', beforeNavHandler)
+      router.goTo('/public')
+
+      expect(beforeNavHandler).not.toHaveBeenCalled()
+    })
+
+    it('should throw for invalid event names at runtime', () => {
+      const beforeNavHandler = vi.fn()
+
+      expect(() => {
+        router.off('invalid-event', beforeNavHandler)
+      }).toThrow('invalid "invalid-event" event')
     })
   })
 })
