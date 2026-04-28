@@ -23,7 +23,9 @@
       "!!out",
       "!!build",
       "!!.claude/worktrees",
-      "!!documentation"
+      "!!documentation",
+      "!!docs/.vitepress/cache",
+      "!!docs/.vitepress/dist"
     ]
   },
   "vcs": {

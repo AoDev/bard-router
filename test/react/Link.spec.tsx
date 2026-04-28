@@ -1,8 +1,7 @@
-import '@testing-library/jest-dom'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {Link} from '../../src/react/Link' // Named export is the bare component, without observer or inject
-import RouterMock from '../../test/RouterMock'
+import {PlainLink} from '../../src/react/Link' // PlainLink is the bare component, without observer or inject
+import {RouterMock} from '../../test/RouterMock'
 
 describe('<Link/>', () => {
   let router: RouterMock
@@ -13,9 +12,9 @@ describe('<Link/>', () => {
 
   it('should create a link element with the right attributes', () => {
     const wrapper = render(
-      <Link to="/some/route" router={router} className="testclass">
+      <PlainLink to="/some/route" router={router} className="testclass">
         My link
-      </Link>
+      </PlainLink>
     )
     const linkElement = wrapper.getByRole('link')
     expect(linkElement.getAttribute('href')).toBe('/some/route')
@@ -25,14 +24,14 @@ describe('<Link/>', () => {
 
   describe('the "active" property', () => {
     it('should add the "active" css class when true and preserve any additional class', () => {
-      render(<Link to="/some/route" className="link" active router={router} />)
+      render(<PlainLink to="/some/route" className="link" active router={router} />)
 
       const linkElement = screen.getByRole('link')
       expect(linkElement.getAttribute('class')).toBe('link active')
     })
     it('should NOT add the "active" css class when false or when undefined', () => {
-      render(<Link to="/some/route" className="link" router={router} />)
-      render(<Link to="/some/route" className="link" active={false} router={router} />)
+      render(<PlainLink to="/some/route" className="link" router={router} />)
+      render(<PlainLink to="/some/route" className="link" active={false} router={router} />)
 
       const links = screen.getAllByRole('link')
       links.forEach((link) => {
@@ -46,14 +45,14 @@ describe('<Link/>', () => {
       router.paramMatch.mockImplementation(() => true)
       router.route = '/some/route'
       render(
-        <Link to="/some/route" className="link" autoActive router={router}>
+        <PlainLink to="/some/route" className="link" autoActive router={router}>
           Matching
-        </Link>
+        </PlainLink>
       )
       render(
-        <Link to="/some/other-route" className="link" autoActive router={router}>
+        <PlainLink to="/some/other-route" className="link" autoActive router={router}>
           Not Matching
-        </Link>
+        </PlainLink>
       )
 
       const matchingLink = screen.getByText('Matching')
@@ -71,7 +70,7 @@ describe('<Link/>', () => {
     it('should call the router.goTo method with the link route and params', async () => {
       const user = userEvent.setup()
       const params = {id: 1}
-      render(<Link to="/some/route" className="link" router={router} params={params} />)
+      render(<PlainLink to="/some/route" className="link" router={router} params={params} />)
 
       await user.click(screen.getByRole('link'))
 

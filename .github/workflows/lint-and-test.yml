@@ -28,5 +28,5 @@ jobs:
       - name: Run Biome check
         run: npm run lint:error
 
-      - name: Run Jest
+      - name: Run Vitest
         run: npm run test-unit

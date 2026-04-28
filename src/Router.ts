@@ -1,5 +1,5 @@
 import * as mobx from 'mobx'
-import {diffPaths, includes, removeFromArray, splitPath} from './utils'
+import {diffPaths, splitPath} from './utils'
 
 export type RouteParam = Record<string, string | number>
 
@@ -23,6 +23,13 @@ type RouterHookArgs = {
 }
 
 type RouterNavHookHandler = (args: RouterHookArgs) => void
+const routerEvents = ['beforeNav', 'afterNav'] as const
+type RouterEventName = (typeof routerEvents)[number]
+type RouterEventHandlers = Record<RouterEventName, RouterNavHookHandler[]>
+
+function isRouterEventName(eventName: string): eventName is RouterEventName {
+  return routerEvents.some((routerEvent) => routerEvent === eventName)
+}
 
 export interface IRouteConfig {
   beforeEnter?: RouteNavHook
@@ -44,21 +51,18 @@ export interface IBardRouter {
   params: RouteParam
   story: IRequest[]
   options: IRouterOptions
-  eventHandlers: {beforeNav: RouterNavHookHandler[]; afterNav: RouterNavHookHandler[]}
+  eventHandlers: RouterEventHandlers
 }
 
-export default class Router implements IBardRouter {
+export class Router implements IBardRouter {
   routes: Record<string, IRouteConfig>
   route = '/'
   params: Record<string, string | number> = {}
   story: IRequest[] = []
   options: IRouterOptions
-  eventHandlers: {beforeNav: RouterNavHookHandler[]; afterNav: RouterNavHookHandler[]} = {
-    beforeNav: [],
-    afterNav: [],
-  }
+  eventHandlers: RouterEventHandlers = {beforeNav: [], afterNav: []}
 
-  static routerEvents = ['beforeNav', 'afterNav']
+  static routerEvents = routerEvents
 
   /**
    * Clone a request object.
@@ -185,7 +189,7 @@ export default class Router implements IBardRouter {
    * Attach router hook.
    * This hook runs for every route change
    */
-  on(eventName: 'beforeNav' | 'afterNav', handler: RouterNavHookHandler) {
+  on(eventName: RouterEventName, handler: RouterNavHookHandler) {
     this.eventHandlers[eventName].push(handler)
   }
 
@@ -194,11 +198,13 @@ export default class Router implements IBardRouter {
    * @param {['beforeNav', 'afterNav']} eventName
    * @param {Function} handler - Anonymous functions can not be removed
    */
-  off(eventName: 'beforeNav' | 'afterNav', handler: RouterNavHookHandler) {
-    if (!includes(Router.routerEvents, eventName)) {
+  off(eventName: RouterEventName | string, handler: RouterNavHookHandler) {
+    if (!isRouterEventName(eventName)) {
       throw new Error(`invalid "${eventName}" event`)
     }
-    removeFromArray(this.eventHandlers[eventName], handler)
+    this.eventHandlers[eventName] = this.eventHandlers[eventName].filter((eventHandler) => {
+      return eventHandler !== handler
+    })
   }
 
   /**

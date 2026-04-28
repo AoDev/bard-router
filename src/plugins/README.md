@@ -6,4 +6,4 @@
 
 ---
 
-[Plugins documentation](https://bard-mobx-router.netlify.com/docs/plugins_scroll)
+[Plugins documentation](https://aodev.github.io/bard-router/plugins-scroll)

@@ -1,7 +1,7 @@
 import {inject, observer} from 'mobx-react'
 import type {ComponentProps, ComponentType, JSX} from 'react'
 import {createElement} from 'react'
-import type Router from '../Router'
+import type {Router} from '../Router'
 
 export interface RouteOwnProps<C extends ComponentType<any>> {
   router: Router
@@ -20,7 +20,7 @@ type InjectedRouteComponent = <C extends ComponentType<any>>(
   props: InjectedRouteProps<C>
 ) => JSX.Element | null
 
-export const Route: RouteComponent = (props) => {
+export const PlainRoute: RouteComponent = (props) => {
   const {router, path, Component, ...otherProps} = props
   if (!router?.route.startsWith(path)) {
     return null
@@ -32,7 +32,7 @@ export const Route: RouteComponent = (props) => {
  * Route component with the router already available
  */
 const InjectedRoute = inject((stores: {router: Router}) => ({router: stores.router}))(
-  observer(Route)
+  observer(PlainRoute)
 )
 
-export default InjectedRoute as unknown as InjectedRouteComponent
+export const Route = InjectedRoute as unknown as InjectedRouteComponent

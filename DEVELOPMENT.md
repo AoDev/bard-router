@@ -14,12 +14,15 @@
 - `npm run lint` - Biome check (lint + format + imports)
 - `npm run lint:error` - same checks as `lint`, diagnostics at error level only (quieter logs; CI uses this)
 - `npm run lint:fix` - Biome lint with auto-fix
-- `npm test` - Jest (`ts-jest`)
+- `npm test` - Vitest
+- `npm run docs:dev` - run VitePress docs locally
+- `npm run docs:build` - build VitePress docs
+- `npm run docs:preview` - preview built docs locally
 
 ## Node.js: published lib vs this repo
 
 - **`engines.node`** (`>=16`): rough **consumer** floor for running published `lib/**/*.js` / `esm/**/*.mjs`. Current emit uses class fields, spread, and destructuring (no `??` / `?.` in output); Node 14 could load similar syntax but is EOL, so **16** is the documented minimum.
-- **`devEngines`**: **contributors / CI only** — Node and npm versions needed to install devDependencies and run Rslib/Biome/Jest. Matches `@rslib/core` / `@rsbuild/core` (`^20.19.0 || >=22.12.0`). Enforced by npm on `install` / `ci` / `run` when using a npm version that supports `devEngines` (npm 10+); older npm ignores the field.
+- **`devEngines`**: **contributors / CI only** — Node and npm versions needed to install devDependencies and run Rslib/Biome/Vitest. Matches `@rslib/core` / `@rsbuild/core` (`^20.19.0 || >=22.12.0`). Enforced by npm on `install` / `ci` / `run` when using a npm version that supports `devEngines` (npm 10+); older npm ignores the field.
 
 ## Package entrypoints
 
@@ -30,7 +33,6 @@
 - `types`: `lib/index.d.ts`
 - `exports`:
   - `.` with `import` / `require` / `types`
-  - `./lib/*` and `./esm/*` subpaths
 
 ## Pre-release checklist
 

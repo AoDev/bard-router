@@ -1,4 +1,4 @@
-import type Router from '../Router'
+import type {Router} from '../Router'
 
 function register(router: Router, window: {scrollTo: (x: number, y: number) => void}) {
   const scrollPluginHandler = () => window.scrollTo(0, 0)
@@ -12,4 +12,4 @@ function register(router: Router, window: {scrollTo: (x: number, y: number) => v
   return unregister
 }
 
-export default {register}
+export const scrollPlugin = {register}
