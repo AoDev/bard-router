@@ -38,4 +38,4 @@ Development guide: [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Check the docs :)
 
-[Full documentation site](https://bard-mobx-router.netlify.com)
+[Full documentation site](https://aodev.github.io/bard-router/)

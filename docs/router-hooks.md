@@ -1,8 +1,4 @@
----
-id: router_hooks
-title: Router hooks
-sidebar_label: Router hooks
----
+# Router hooks
 
 As opposed to route specific hooks, the router hooks are handlers that you want to call any time there is a navigation event.
 

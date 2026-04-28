@@ -1,15 +1,11 @@
----
-id: getting_started
-title: Getting started
-sidebar_label: Getting started
----
+# Getting started
 
 Bard Mobx Router is pretty simple to use, here is an overview of the steps to follow.
 
 ## Install
 
-```
-npm install bard-router -DE
+```sh
+npm install bard-router
 ```
 
 Dependencies needed: `react`, `mobx`, `mobx-react`.

@@ -1,8 +1,4 @@
----
-id: plugins_scroll
-title: Scroll plugin
-sidebar_label: Scroll plugin
----
+# Scroll plugin
 
 > **Simple plugin that manages the window scroll automatically when navigating.**
 

@@ -1,8 +1,4 @@
----
-id: about_router
-title: Philosophy
-sidebar_label: Philosophy
----
+# Philosophy
 
 **You can always fix a bug in a library, but a bad architecture will turn your entire project into Hell.**
 

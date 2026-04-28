@@ -28,7 +28,7 @@ OK
 **With auto-format side effects:**
 
 ```
-FORMATTED: tasks/BACKLOG.md, documentation/website/static/css/custom.css
+FORMATTED: tasks/BACKLOG.md, docs/.vitepress/theme/custom.css
 OK
 ```
 

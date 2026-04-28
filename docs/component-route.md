@@ -1,8 +1,4 @@
----
-id: component_route
-title: <Route/> component
-sidebar_label: <Route/>
----
+# `<Route/>` component
 
 `Route` are simple UI switches that either render or not the corresponding UI component depending on the router state.
 

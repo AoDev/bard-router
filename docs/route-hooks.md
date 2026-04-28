@@ -1,8 +1,4 @@
----
-id: route_hooks
-title: Route specific hooks
-sidebar_label: Route specific hooks
----
+# Route specific hooks
 
 **Use route hooks if you need to redirect or run custom logic for a particular navigation request.**
 

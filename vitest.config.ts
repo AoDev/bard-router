@@ -9,6 +9,6 @@ export default defineConfig({
     restoreMocks: true,
     setupFiles: ['./test/setup/vitest.setup.ts'],
     include: ['./test/**/*.spec.{ts,tsx}', './test/**/*.test.{ts,tsx}'],
-    exclude: ['./node_modules/**', './lib/**', './esm/**', './documentation/**'],
+    exclude: ['./node_modules/**', './lib/**', './esm/**'],
   },
 })

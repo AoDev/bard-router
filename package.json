@@ -25,6 +25,10 @@
     "lint:agent": "ts-node scripts/lint-agent.ts",
     "lint:error": "biome check . --diagnostic-level=error",
     "lint:fix": "biome lint --write .",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "docs:check": "npm run docs:build",
     "build": "del-cli lib esm && rslib build",
     "build:inspect": "rslib inspect --verbose",
     "prepare": "npm run build",
@@ -80,6 +84,7 @@
     "standard-version": "9.5.0",
     "ts-node": "10.9.1",
     "typescript": "5.2.2",
+    "vitepress": "^1.6.4",
     "vitest": "4.1.5"
   }
 }

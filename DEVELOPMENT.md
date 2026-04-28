@@ -15,6 +15,9 @@
 - `npm run lint:error` - same checks as `lint`, diagnostics at error level only (quieter logs; CI uses this)
 - `npm run lint:fix` - Biome lint with auto-fix
 - `npm test` - Vitest
+- `npm run docs:dev` - run VitePress docs locally
+- `npm run docs:build` - build VitePress docs
+- `npm run docs:preview` - preview built docs locally
 
 ## Node.js: published lib vs this repo
 
@@ -30,7 +33,6 @@
 - `types`: `lib/index.d.ts`
 - `exports`:
   - `.` with `import` / `require` / `types`
-  - `./lib/*` and `./esm/*` subpaths
 
 ## Pre-release checklist
 

@@ -1,8 +1,4 @@
----
-id: component_link
-title: <Link/> component
-sidebar_label: <Link/>
----
+# `<Link/>` component
 
 The Link component lets your users navigate through your UI.
 
