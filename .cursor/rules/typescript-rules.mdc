@@ -1,0 +1,182 @@
+---
+description: Do not use type assertions in typescript. Properly use typeguards.
+globs: "*.ts, *.tsx"
+alwaysApply: true
+---
+
+- Always prioritize type correctness and safety over development speed.
+- Find and use proper TypeScript types before using 'any'.
+- Search codebase for existing type definitions before creating custom types.
+- You should never use the 'as' assertion unless I approve it.
+- Avoid the usage of `any`. Always use the right type or fallback to `unknown` when the data type can't be found.
+- Document any intentional type compromises with explanatory comments
+- Use block statement, always use curly braces.
+- Prefer using alias paths instead of relative paths for imports when possible.
+- Prefer single line objects declarations
+- Do not remove console.log statements even if flagged by the linter. (It's up to the developer)
+- Do not remove commented code.
+- Prefer using type instead of interface when declaring data types.
+- To coerce to a number use Number(value), never use parseInt or parseFloat.
+- Use `for const ... of` instead of `for i=0; i < n; i++` loops everytime it's possible.
+- Follow the KISS principle (Keep It Simple Stupid)
+- Do not add explicit `void` return types on functions or methods — omit them.
+
+### Do not prefix calls with the `void` operator
+
+Do not use the `void` operator on call expressions (`void foo()`, `void this.bar()`, `void vm.baz()`) just to discard a return value, look explicit about ignoring a result, or mark fire-and-forget work. Call the function or method directly. Biome enforces this via `linter.rules.complexity.noVoid` in `biome.json` (also disallows `void 0` / `void (expr)` patterns).
+
+This is separate from omitting explicit `: void` return type annotations on declarations (see the bullet above).
+
+```ts
+// BAD
+void vm.refresh()
+void store.load()
+
+// GOOD
+vm.refresh()
+store.load()
+```
+
+For Promises you choose not to await, put the work in an async store or VM method, use `await` where the caller is already async, or otherwise structure the flow so the owning layer handles the async lifecycle — do not default to `void someAsync()` at call sites.
+
+### Use proper type narrowing, do not trick the compiler with type assertions
+
+In typescript, when loading data from an API, a file or any unknown data structure, always narrow types properly. Create typeguards to check the data structure and validate its type.
+
+We need proper type guards that return `val is Type`, and use those everywhere data crosses a trust boundary.
+
+For example: loading a json like
+
+```ts
+const json = await loadSomeJson()
+
+// Correct
+function isMyDataStructure(): json is MyDataStructure {
+    if (typeof of json === 'object' && 'data' in json && Array.isArray(json.data)) {
+        // more checks here
+    }
+    return false
+}
+
+// Incorrect
+
+// incorrect example 1
+const myJson: MyDataStructure = json as MyDataStructure
+
+// incorrect example 2
+const sigsUnknown = (value as {signatures?: unknown}).signatures
+if (!Array.isArray(sigsUnknown)) {
+    return false
+}
+// instead define a typeguard for an object that has a signatures propery and a typeguard for Signature
+```
+
+### When Type Assertions Are Acceptable (Rare Cases)
+- Temporary workarounds with clear TODO comments for proper typing
+
+
+### Using block statements
+
+```ts
+// BAD
+if (condition) doSomething();
+
+// GOOD
+if (condition) {
+  doSomething();
+}
+```
+
+### Prefer path aliases
+
+We have some path aliases defined in tsconfig.json that should be taken advantage of. Relative paths can cause problems when refactoring and moving files around.
+
+For example: importing libs with the `@lib` alias.
+
+### Avoid unnecessary temporary variables
+
+Do not create a local variable just to read a value once or twice — read from the source directly.
+
+```ts
+// BAD
+const {rootStore} = vm
+const {runs} = rootStore.runs  // rootStore used only to get runs
+
+// GOOD
+const {runs} = vm.rootStore.runs
+```
+
+Exception: `rootStore` top-level properties are feature stores and may be destructured for clarity when more than one property from that store is used.
+
+```ts
+// OK — multiple properties from the same store
+const {runs, loading, groupBy} = vm.rootStore.runs
+```
+
+### Do not write explicit generic parameters when they can be inferred
+
+Omit type parameters on function calls and JSX components when TypeScript can infer them from the arguments or props.
+
+```ts
+// BAD
+<Select<GroupByOption> options={groupBySelectOptions} ... />
+
+// GOOD
+<Select options={groupBySelectOptions} ... />
+```
+
+### Prefer single line objects declaration.
+
+Unless the linter objects to it (because of line length rule), you should try to avoid unnecessary new lines.
+
+```ts
+// BAD
+const myObject = {
+  prop1: "prop1",
+  prop2: "prop2",
+};
+
+// BETTER
+const myObject = { prop1: "prop1", prop2: "prop2" };
+```
+
+### Avoid exporting internal types and function
+
+Unless used externally, do not leak (export) types or functions out of their module.
+
+```ts
+// BAD
+export type MyType {...} // <- do not export this if only used internally
+
+export const fn(arg: MyType) {...}
+```
+
+### Avoid coercion in comparison checks for null
+
+While valid, prefer using `A !== B` instead of `A != B` and make sure this properly reflect the expected behaviour.
+
+### Prefer using ternaries
+
+For simple assignments or condition paths, prefer using ternaries instead of "if" statements.
+
+### Prefer Union Types with Discriminated Unions
+```typescript
+// ✅ Good - Discriminated union
+type TimeframeOption = 
+  | { type: 'daily' }
+  | { type: 'weekly'; aggregation: 'avg' | 'median' | 'last' }
+
+// ❌ Avoid - String literals without validation
+type TimeframeOption = 'daily' | 'weekly-avg' | 'weekly-median' | 'weekly-last'
+```
+
+### Use `satisfies` Operator for Type Validation
+- Use `satisfies` when you want to check that a value matches a type without changing its inferred type
+- Particularly useful for configuration objects and constants
+
+### Common Patterns to Avoid
+- String splitting followed by type assertion
+- Object property access followed by type assertion
+- Array methods returning `unknown` followed by type assertion
+- Function parameters that could be `any` followed by type assertion
+- Casting to a loose type with `val as any` or `val as unknown`

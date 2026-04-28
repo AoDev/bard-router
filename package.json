@@ -1,7 +1,7 @@
 {
   "name": "bard-router",
   "version": "4.0.0-rc.0",
-  "description": "More than just a routing solution, for React/Mobx applications",
+  "description": "Type-safe React + MobX router with simple navigation APIs, hooks, and extensible plugins.",
   "homepage": "https://github.com/AoDev/bard-router",
   "main": "lib/index.js",
   "module": "esm/index.mjs",
@@ -24,6 +24,7 @@
   ],
   "scripts": {
     "lint": "biome check .",
+    "lint:agent": "ts-node scripts/lint-agent.ts",
     "lint:error": "biome check . --diagnostic-level=error",
     "lint:fix": "biome lint --write .",
     "build": "del-cli lib esm && rslib build",
