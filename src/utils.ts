@@ -1,7 +1,7 @@
 /**
  * @see splitPath
  */
-export function splitPathReducer(acc: any[], step: string, index: number) {
+export function splitPathReducer(acc: string[], step: string, index: number) {
   acc.push(index === 0 ? '' : `${acc[index - 1]}/${step}`)
   return acc
 }
